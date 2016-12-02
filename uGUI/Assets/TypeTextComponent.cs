@@ -68,6 +68,48 @@ public class TypeTextComponent : MonoBehaviour
         var tagType = "";
         for (var i = 0; i < len; i++)
         {
+            // Check for opening nodes
+            var remainingText = text.Substring(i, text.Length - i);
+            if (RichTextTag.StringStartsWithTag(remainingText))
+            {
+                var tag = RichTextTag.ParseNext(remainingText);
+                Debug.Log("Apply Tag: " + tag.ToString());
+                i += tag.TagText.Length - 1;
+                continue;
+            }
+
+            /*
+            if (text[i] == RichTextTag.OpeningNodeFormat.Substring(0, 1))
+            {
+                var tag = ParseNextTag(string.Subtring(i, text.Length - i));
+                if (tagIsValid)
+                {
+                    ApplyTag(tag)
+                    {
+                        if (tag.IsOpening)
+                        {
+                            if(tag.Type == speed)
+                            {
+                            SetSpeed
+                            } else {
+                            _currentText += tag.RawText;
+                            }
+                        } else
+                        {
+                            if (tag.Type == uGUI)
+                            {
+                            _currentText += tag.RawText;
+                            }
+                        }
+                    }
+
+                    i += tag.Length;
+                    continue;
+                }
+
+                _currrentText += text[i];
+            }
+
             if (text[i] == '[' && i + 6 < len && text.Substring(i, 7).Equals("[speed="))
             {
                 var parseSpeed = "";
@@ -146,9 +188,11 @@ public class TypeTextComponent : MonoBehaviour
 
             if (symbolDetected)
                 continue;
+            */  
 
             _currentText += text[i];
-            label.text = _currentText + (tagOpened ? string.Format("</{0}>", tagType) : "");
+            label.text = _currentText;
+            //label.text = _currentText + (tagOpened ? string.Format("</{0}>", tagType) : "");
             yield return new WaitForSeconds(speed);
         }
 
