@@ -85,14 +85,6 @@ public class TypeTextComponent : MonoBehaviour
                 continue;
             }
 
-            // ngui color tag
-            if (text[i] == '[' && i + 7 < len && text[i + 7] == ']')
-            {
-                _currentText += text.Substring(i, 8);
-                i += 8 - 1;
-                continue;
-            }
-
             var symbolDetected = false;
             for (var j = 0; j < _uguiSymbols.Length; j++)
             {
