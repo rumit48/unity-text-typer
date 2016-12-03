@@ -122,9 +122,16 @@ public class TypeTextComponent : MonoBehaviour
         else
         {
             // Pop outstanding tag
-            // TODO Make this stack a list and remove it? Hmm what about color embedded in color?
-            // Basically the problem is what if they don't reverse the tags in the same order?
-            this.outstandingTags.Pop();
+            var poppedTag = this.outstandingTags.Pop();
+            if (poppedTag.TagType != tag.TagType)
+            {
+                var assertionMessage = string.Format(
+                                           "Popped TagType [{0}] did not match last outstanding tagType [{1}] " +
+                                           "in TypeText. Unity only respects tags that are added as a stack.",
+                                           poppedTag.TagType,
+                                           tag.TagType);
+                Debug.LogError(assertionMessage);
+            }
         }
 
         // We only want to add in text of tags for elements that Unity will parse
@@ -172,7 +179,6 @@ public class TypeTextComponent : MonoBehaviour
 
 public static class TypeTextComponentUtility
 {
-
     public static void TypeText(this Text label, string text, float speed = 0.05f, TypeTextComponent.OnComplete onComplete = null)
     {
         var typeText = label.GetComponent<TypeTextComponent>();

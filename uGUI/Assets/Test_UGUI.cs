@@ -14,7 +14,6 @@ public class Test_UGUI : MonoBehaviour {
         scripts.Enqueue("bold <b>text</b> test <b>bold</b> text <b>test</b>");
         scripts.Enqueue("You can <size=40>size 40</size> and <size=20>size 20</size>");
         scripts.Enqueue("You can <color=#ff0000ff>color</color> tag <color=#00ff00ff>like this</color>.");
-        scripts.Enqueue("Here's <b><i>text with</b></i> inverted tags.");
         ShowScript();
     }
 
