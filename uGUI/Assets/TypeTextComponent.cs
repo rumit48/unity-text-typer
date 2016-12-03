@@ -16,6 +16,9 @@ public class TypeTextComponent : MonoBehaviour
     private string _finalText;
     private Coroutine _typeTextCoroutine;
 
+    private float currentSpeed;
+
+    private static readonly List<string> uGUISymbols = new List<string> { "b", "i", "size", "color" };
     private static readonly string[] _uguiSymbols = { "b", "i" };
     private static readonly string[] _uguiCloseSymbols = { "b", "i", "size", "color" };
     private OnComplete _onCompleteCallback;
@@ -67,6 +70,7 @@ public class TypeTextComponent : MonoBehaviour
     public IEnumerator TypeText(string text)
     {
         _currentText = "";
+        this.currentSpeed = _defaultSpeed;
 
         var len = text.Length;
         var speed = _defaultSpeed;
@@ -85,36 +89,6 @@ public class TypeTextComponent : MonoBehaviour
             }
 
             /*
-            if (text[i] == RichTextTag.OpeningNodeFormat.Substring(0, 1))
-            {
-                var tag = ParseNextTag(string.Subtring(i, text.Length - i));
-                if (tagIsValid)
-                {
-                    ApplyTag(tag)
-                    {
-                        if (tag.IsOpening)
-                        {
-                            if(tag.Type == speed)
-                            {
-                            SetSpeed
-                            } else {
-                            _currentText += tag.RawText;
-                            }
-                        } else
-                        {
-                            if (tag.Type == uGUI)
-                            {
-                            _currentText += tag.RawText;
-                            }
-                        }
-                    }
-
-                    i += tag.Length;
-                    continue;
-                }
-
-                _currrentText += text[i];
-            }
 
             if (text[i] == '[' && i + 6 < len && text.Substring(i, 7).Equals("[speed="))
             {
@@ -199,14 +173,10 @@ public class TypeTextComponent : MonoBehaviour
             _currentText += text[i];
             label.text = _currentText;
 
-            var getClosedTags = string.Empty;
-            foreach (var tag in this.outstandingTags)
-            {
-                label.text = string.Concat(label.text, tag.ClosingTagText);
-            }
+            this.CloseOutstandingTags();
 
             //label.text = _currentText + (tagOpened ? string.Format("</{0}>", tagType) : "");
-            yield return new WaitForSeconds(speed);
+            yield return new WaitForSeconds(this.currentSpeed);
         }
 
         _typeTextCoroutine = null;
@@ -217,21 +187,53 @@ public class TypeTextComponent : MonoBehaviour
 
     private void ApplyTag(RichTextTag tag)
     {
-        Debug.Log("Apply Tag: " + tag.ToString());
-        if (tag.IsClosignTag)
+        if (!tag.IsClosignTag)
         {
-            // Pop outstanding tag
-            // TODO Make this stack a list and remove it? Hmm what about color embedded in color?
-            this.outstandingTags.Pop();
+            this.outstandingTags.Push(tag);
+
+            if (tag.TagType == "speed")
+            {
+                float speed = 0.0f;
+                try
+                {
+                    speed = float.Parse(tag.Parameter);
+                }
+                catch
+                {
+                    speed = this._defaultSpeed;
+                }
+
+                this.currentSpeed = speed;
+            }
         }
         else
         {
-            this.outstandingTags.Push(tag);
+            // Pop outstanding tag
+            // TODO Make this stack a list and remove it? Hmm what about color embedded in color?
+            // Basically the problem is what if they don't reverse the tags in the same order?
+            this.outstandingTags.Pop();
         }
 
-        _currentText += tag.TagText;
+        // We only want to add in text of tags for elements that Unity will parse
+        // in its RichText enabled Text widget
+        if (uGUISymbols.Contains(tag.TagType))
+        {
+            _currentText += tag.TagText;
+        }
+    }
 
-        // TODO: Apply speed tags and other custom tags.
+    private void CloseOutstandingTags()
+    {
+        var getClosedTags = string.Empty;
+        foreach (var tag in this.outstandingTags)
+        {
+            // We only need to add back in Unity tags, since they've been
+            // added and Unity expects closing tags.
+            if (uGUISymbols.Contains(tag.TagType))
+            {
+                label.text = string.Concat(label.text, tag.ClosingTagText);
+            }
+        }
     }
 
     private string ReplaceSpeed(string text)
