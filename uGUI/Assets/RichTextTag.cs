@@ -15,6 +15,14 @@ public class RichTextTag
 
     public string TagText { get; private set; }
 
+    public string ClosingTagText
+    {
+        get
+        {
+            return this.IsClosignTag ? this.TagText : string.Format("</{0}>", this.TagType);
+        }
+    }
+
     public string TagType
     {
         get
@@ -50,7 +58,13 @@ public class RichTextTag
         }
     }
 
-    public bool IsClosignTag { get ; private set; }
+    public bool IsClosignTag
+    {
+        get
+        {
+            return this.TagText.Length > 2 && this.TagText[1] == EndTagDelimeter;
+        }
+    }
 
     public static bool StringStartsWithTag(string body)
     {
@@ -82,6 +96,6 @@ public class RichTextTag
 
     public override string ToString()
     {
-        return string.Format("[RichTextTag: TagText={0}, TagType={1}, IsClosignTag={2}, Parameter={3}]", TagText, TagType, IsClosignTag, Parameter);
+        return this.TagText;
     }
 }

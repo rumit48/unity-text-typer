@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,6 +20,8 @@ public class TypeTextComponent : MonoBehaviour
     private static readonly string[] _uguiCloseSymbols = { "b", "i", "size", "color" };
     private OnComplete _onCompleteCallback;
 
+    private Stack<RichTextTag> outstandingTags;
+
     private void Init()
     {
         if (label == null)
@@ -28,6 +31,8 @@ public class TypeTextComponent : MonoBehaviour
     public void Awake()
     {
         Init();
+
+        this.outstandingTags = new Stack<RichTextTag>();
     }
 
     public void SetText(string text, float speed = -1)
@@ -73,7 +78,7 @@ public class TypeTextComponent : MonoBehaviour
             if (RichTextTag.StringStartsWithTag(remainingText))
             {
                 var tag = RichTextTag.ParseNext(remainingText);
-                Debug.Log("Apply Tag: " + tag.ToString());
+                this.ApplyTag(tag);
                 i += tag.TagText.Length - 1;
                 continue;
             }
@@ -192,6 +197,13 @@ public class TypeTextComponent : MonoBehaviour
 
             _currentText += text[i];
             label.text = _currentText;
+
+            var getClosedTags = string.Empty;
+            foreach (var tag in this.outstandingTags)
+            {
+                label.text = string.Concat(label.text, tag.ClosingTagText);
+            }
+
             //label.text = _currentText + (tagOpened ? string.Format("</{0}>", tagType) : "");
             yield return new WaitForSeconds(speed);
         }
@@ -200,6 +212,25 @@ public class TypeTextComponent : MonoBehaviour
 
         if (_onCompleteCallback != null)
             _onCompleteCallback();
+    }
+
+    private void ApplyTag(RichTextTag tag)
+    {
+        Debug.Log("Apply Tag: " + tag.ToString());
+        if (tag.IsClosignTag)
+        {
+            // Pop outstanding tag
+            // TODO Make this stack a list and remove it? Hmm what about color embedded in color?
+            this.outstandingTags.Pop();
+        }
+        else
+        {
+            this.outstandingTags.Push(tag);
+        }
+
+        _currentText += tag.TagText;
+
+        // TODO: Apply speed tags and other custom tags.
     }
 
     private string ReplaceSpeed(string text)
