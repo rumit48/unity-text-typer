@@ -18,9 +18,8 @@ public class TypeTextComponent : MonoBehaviour
 
     private float currentSpeed;
 
-    private static readonly List<string> uGUISymbols = new List<string> { "b", "i", "size", "color" };
-    private static readonly string[] _uguiSymbols = { "b", "i" };
-    private static readonly string[] _uguiCloseSymbols = { "b", "i", "size", "color" };
+    private static readonly List<string> uGUITagTypes = new List<string> { "b", "i", "size", "color" };
+    private static readonly List<string> customTagTypes = new List<string> { "speed" };
     private OnComplete _onCompleteCallback;
 
     private Stack<RichTextTag> outstandingTags;
@@ -43,7 +42,7 @@ public class TypeTextComponent : MonoBehaviour
         Init();
 
         _defaultSpeed = speed > 0 ? speed : _defaultSpeed;
-        _finalText = ReplaceSpeed(text);
+        _finalText = RemoveCustomTags(text);
         label.text = "";
 
         if (_typeTextCoroutine != null)
@@ -72,13 +71,10 @@ public class TypeTextComponent : MonoBehaviour
         _currentText = "";
         this.currentSpeed = _defaultSpeed;
 
-        var len = text.Length;
-        var speed = _defaultSpeed;
-        var tagOpened = false;
-        var tagType = "";
-        for (var i = 0; i < len; i++)
+        for (var i = 0; i < text.Length; i++)
         {
             // Check for opening nodes
+            // TODO: Make functions pure
             var remainingText = text.Substring(i, text.Length - i);
             if (RichTextTag.StringStartsWithTag(remainingText))
             {
@@ -88,94 +84,11 @@ public class TypeTextComponent : MonoBehaviour
                 continue;
             }
 
-            /*
-
-            if (text[i] == '[' && i + 6 < len && text.Substring(i, 7).Equals("[speed="))
-            {
-                var parseSpeed = "";
-                for (var j = i + 7; j < len; j++)
-                {
-                    if (text[j] == ']')
-                        break;
-                    parseSpeed += text[j];
-                }
-
-                if (!float.TryParse(parseSpeed, out speed))
-                    speed = 0.05f;
-
-                i += 8 + parseSpeed.Length - 1;
-                continue;
-            }
-
-            var symbolDetected = false;
-            for (var j = 0; j < _uguiSymbols.Length; j++)
-            {
-                var symbol = string.Format("<{0}>", _uguiSymbols[j]);
-                if (text[i] == '<' && i + (1 + _uguiSymbols[j].Length) < len && text.Substring(i, 2 + _uguiSymbols[j].Length).Equals(symbol))
-                {
-                    _currentText += symbol;
-                    i += (2 + _uguiSymbols[j].Length) - 1;
-                    symbolDetected = true;
-                    tagOpened = true;
-                    tagType = _uguiSymbols[j];
-                    break;
-                }
-            }
-
-            if (text[i] == '<' && i + (1 + 15) < len && text.Substring(i, 2 + 6).Equals("<color=#") && text[i + 16] == '>')
-            {
-                _currentText += text.Substring(i, 2 + 6 + 8);
-                i += (2 + 14) - 1;
-                symbolDetected = true;
-                tagOpened = true;
-                tagType = "color";
-            }
-
-            if (text[i] == '<' && i + 5 < len && text.Substring(i, 6).Equals("<size="))
-            {
-                var parseSize = "";
-                var size = (float)label.fontSize;
-                for (var j = i + 6; j < len; j++)
-                {
-                    if (text[j] == '>')
-                        break;
-                    parseSize += text[j];
-                }
-
-                if (float.TryParse(parseSize, out size))
-                {
-                    _currentText += text.Substring(i, 7 + parseSize.Length);
-                    i += (7 + parseSize.Length) - 1;
-                    symbolDetected = true;
-                    tagOpened = true;
-                    tagType = "size";                    
-                }
-            }
-
-            // exit symbol
-            for (var j = 0; j < _uguiCloseSymbols.Length; j++)
-            {
-                var symbol = string.Format("</{0}>", _uguiCloseSymbols[j]);
-                if (text[i] == '<' && i + (2 + _uguiCloseSymbols[j].Length) < len && text.Substring(i, 3 + _uguiCloseSymbols[j].Length).Equals(symbol))
-                {
-                    _currentText += symbol;
-                    i += (3 + _uguiCloseSymbols[j].Length) - 1;
-                    symbolDetected = true;
-                    tagOpened = false;
-                    break;
-                }
-            }
-
-            if (symbolDetected)
-                continue;
-            */  
-
             _currentText += text[i];
             label.text = _currentText;
 
             this.CloseOutstandingTags();
 
-            //label.text = _currentText + (tagOpened ? string.Format("</{0}>", tagType) : "");
             yield return new WaitForSeconds(this.currentSpeed);
         }
 
@@ -216,7 +129,7 @@ public class TypeTextComponent : MonoBehaviour
 
         // We only want to add in text of tags for elements that Unity will parse
         // in its RichText enabled Text widget
-        if (uGUISymbols.Contains(tag.TagType))
+        if (uGUITagTypes.Contains(tag.TagType))
         {
             _currentText += tag.TagText;
         }
@@ -224,42 +137,26 @@ public class TypeTextComponent : MonoBehaviour
 
     private void CloseOutstandingTags()
     {
-        var getClosedTags = string.Empty;
         foreach (var tag in this.outstandingTags)
         {
             // We only need to add back in Unity tags, since they've been
             // added and Unity expects closing tags.
-            if (uGUISymbols.Contains(tag.TagType))
+            if (uGUITagTypes.Contains(tag.TagType))
             {
                 label.text = string.Concat(label.text, tag.ClosingTagText);
             }
         }
     }
 
-    private string ReplaceSpeed(string text)
+    private string RemoveCustomTags(string text)
     {
-        var result = "";
-        var len = text.Length;
-        for (var i = 0; i < len; i++)
+        var textWithoutTags = text;
+        foreach (var tagType in customTagTypes)
         {
-            if (text[i] == '[' && i + 6 < len && text.Substring(i, 7).Equals("[speed="))
-            {
-                var speedLength = 0;
-                for (var j = i + 7; j < len; j++)
-                {
-                    if (text[j] == ']')
-                        break;
-                    speedLength++;
-                }
-
-                i += 8 + speedLength - 1;
-                continue;
-            }
-
-            result += text[i];
+            textWithoutTags = RichTextTag.RemoveTagsFromString(textWithoutTags, tagType);
         }
 
-        return result;
+        return textWithoutTags;
     }
 
     public bool IsSkippable()

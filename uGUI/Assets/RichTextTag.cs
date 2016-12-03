@@ -94,6 +94,27 @@ public class RichTextTag
         return new RichTextTag(tagText);
     }
 
+    public static string RemoveTagsFromString(string body, string tagType)
+    {
+        var bodyWithoutTags = body;
+        for (int i = 0; i < body.Length; ++i)
+        {
+            var remainingText = body.Substring(i, body.Length - i);
+            if (StringStartsWithTag(remainingText))
+            {
+                var parsedTag = ParseNext(remainingText);
+                if (parsedTag.TagType == tagType)
+                {
+                    bodyWithoutTags = bodyWithoutTags.Replace(parsedTag.TagText, string.Empty);
+                }
+
+                i += parsedTag.TagText.Length - 1;
+            }
+        }
+
+        return bodyWithoutTags;
+    }
+
     public override string ToString()
     {
         return this.TagText;
