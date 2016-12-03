@@ -56,6 +56,7 @@ public class TypeTextComponent : MonoBehaviour
         if (_typeTextCoroutine != null)
             StopCoroutine(_typeTextCoroutine);
         _typeTextCoroutine = null;
+        this.outstandingTags.Clear();
 
         label.text = _finalText;
 
