@@ -103,21 +103,6 @@ public class TypeTextComponent : MonoBehaviour
         if (!tag.IsClosignTag)
         {
             this.outstandingTags.Push(tag);
-
-            if (tag.TagType == "speed")
-            {
-                float speed = 0.0f;
-                try
-                {
-                    speed = float.Parse(tag.Parameter);
-                }
-                catch
-                {
-                    speed = this._defaultSpeed;
-                }
-
-                this.currentSpeed = speed;
-            }
         }
         else
         {
@@ -134,6 +119,21 @@ public class TypeTextComponent : MonoBehaviour
             }
         }
 
+        if (tag.TagType == "speed")
+        {
+            float speed = 0.0f;
+            try
+            {
+                speed = tag.IsClosignTag ? this._defaultSpeed : float.Parse(tag.Parameter);
+            }
+            catch
+            {
+                speed = this._defaultSpeed;
+            }
+
+            this.currentSpeed = speed;
+        }
+
         // We only want to add in text of tags for elements that Unity will parse
         // in its RichText enabled Text widget
         if (uGUITagTypes.Contains(tag.TagType))
@@ -147,7 +147,7 @@ public class TypeTextComponent : MonoBehaviour
         foreach (var tag in this.outstandingTags)
         {
             // We only need to add back in Unity tags, since they've been
-            // added and Unity expects closing tags.
+            // added to the text and Unity expects closing tags.
             if (uGUITagTypes.Contains(tag.TagType))
             {
                 label.text = string.Concat(label.text, tag.ClosingTagText);
