@@ -8,94 +8,93 @@ public class TypeTextComponent : MonoBehaviour
 {
     public delegate void OnComplete();
 
-    [SerializeField]
-    private float _defaultSpeed = 0.05f;
-
-    private Text label;
-    private string _currentText;
-    private string _finalText;
-    private Coroutine _typeTextCoroutine;
-
-    private float currentSpeed;
-
     private static readonly List<string> uGUITagTypes = new List<string> { "b", "i", "size", "color" };
     private static readonly List<string> customTagTypes = new List<string> { "speed" };
-    private OnComplete _onCompleteCallback;
 
+    [SerializeField]
+    private float defaultSpeed = 0.05f;
+
+    private Text textComponent;
+    private string displayedText;
+    private string finalText;
+    private float currentSpeed;
+    private Coroutine typeTextCoroutine;
     private Stack<RichTextTag> outstandingTags;
+    private OnComplete onCompleteCallback;
 
-    private void Init()
+    private Text TextComponent
     {
-        if (label == null)
-            label = GetComponent<Text>();
+        get
+        {
+            if (this.textComponent == null)
+            {
+                this.textComponent = this.GetComponent<Text>();
+            }
+
+            return this.textComponent;
+        }
     }
 
     public void Awake()
     {
-        Init();
-
         this.outstandingTags = new Stack<RichTextTag>();
     }
 
     public void SetText(string text, float speed = -1)
     {
-        Init();
+        this.defaultSpeed = speed > 0 ? speed : this.defaultSpeed;
+        this.finalText = RemoveCustomTags(text);
+        this.TextComponent.text = "";
 
-        _defaultSpeed = speed > 0 ? speed : _defaultSpeed;
-        _finalText = RemoveCustomTags(text);
-        label.text = "";
-
-        if (_typeTextCoroutine != null)
+        if (this.typeTextCoroutine != null)
         {
-            StopCoroutine(_typeTextCoroutine);
+            StopCoroutine(this.typeTextCoroutine);
         }
 
-        _typeTextCoroutine = StartCoroutine(TypeText(text));
+        this.typeTextCoroutine = StartCoroutine(TypeText(text));
     }
 
     public void SkipTypeText()
     {
-        if (_typeTextCoroutine != null)
-            StopCoroutine(_typeTextCoroutine);
-        _typeTextCoroutine = null;
+        if (this.typeTextCoroutine != null)
+        {
+            StopCoroutine(typeTextCoroutine);
+            this.typeTextCoroutine = null;
+        }
+
         this.outstandingTags.Clear();
+        this.textComponent.text = finalText;
 
-        label.text = _finalText;
-
-        if (_onCompleteCallback != null)
-            _onCompleteCallback();
+        this.OnTypewritingComplete();
     }
 
     public IEnumerator TypeText(string text)
     {
-        _currentText = "";
-        this.currentSpeed = _defaultSpeed;
+        this.displayedText = "";
+        this.currentSpeed = this.defaultSpeed;
 
         for (var i = 0; i < text.Length; i++)
         {
             // Check for opening nodes
-            // TODO: Make functions pure
             var remainingText = text.Substring(i, text.Length - i);
             if (RichTextTag.StringStartsWithTag(remainingText))
             {
                 var tag = RichTextTag.ParseNext(remainingText);
                 this.ApplyTag(tag);
-                i += tag.TagText.Length - 1;
+                i += tag.Length - 1;
                 continue;
             }
 
-            _currentText += text[i];
-            label.text = _currentText;
+            this.displayedText += text[i];
+            textComponent.text = this.displayedText;
 
             this.CloseOutstandingTags();
 
             yield return new WaitForSeconds(this.currentSpeed);
         }
 
-        _typeTextCoroutine = null;
-
-        if (_onCompleteCallback != null)
-            _onCompleteCallback();
+        this.typeTextCoroutine = null;
+        this.OnTypewritingComplete();
     }
 
     private void ApplyTag(RichTextTag tag)
@@ -124,11 +123,11 @@ public class TypeTextComponent : MonoBehaviour
             float speed = 0.0f;
             try
             {
-                speed = tag.IsClosignTag ? this._defaultSpeed : float.Parse(tag.Parameter);
+                speed = tag.IsClosignTag ? this.defaultSpeed : float.Parse(tag.Parameter);
             }
             catch
             {
-                speed = this._defaultSpeed;
+                speed = this.defaultSpeed;
             }
 
             this.currentSpeed = speed;
@@ -138,7 +137,7 @@ public class TypeTextComponent : MonoBehaviour
         // in its RichText enabled Text widget
         if (uGUITagTypes.Contains(tag.TagType))
         {
-            _currentText += tag.TagText;
+            displayedText += tag.TagText;
         }
     }
 
@@ -150,7 +149,7 @@ public class TypeTextComponent : MonoBehaviour
             // added to the text and Unity expects closing tags.
             if (uGUITagTypes.Contains(tag.TagType))
             {
-                label.text = string.Concat(label.text, tag.ClosingTagText);
+                textComponent.text = string.Concat(textComponent.text, tag.ClosingTagText);
             }
         }
     }
@@ -168,12 +167,20 @@ public class TypeTextComponent : MonoBehaviour
 
     public bool IsSkippable()
     {
-        return _typeTextCoroutine != null;
+        return typeTextCoroutine != null;
     }
 
     public void SetOnComplete(OnComplete onComplete)
     {
-        _onCompleteCallback = onComplete;
+        onCompleteCallback = onComplete;
+    }
+
+    private void OnTypewritingComplete()
+    {
+        if (this.onCompleteCallback != null)
+        {
+            this.onCompleteCallback.Invoke();
+        }
     }
 }
 

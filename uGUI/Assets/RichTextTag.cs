@@ -66,6 +66,14 @@ public class RichTextTag
         }
     }
 
+    public int Length
+    {
+        get
+        {
+            return this.TagText.Length;
+        }
+    }
+
     public static bool StringStartsWithTag(string body)
     {
         return body.StartsWith(OpeningNodeDelimeter.ToString());
@@ -108,7 +116,7 @@ public class RichTextTag
                     bodyWithoutTags = bodyWithoutTags.Replace(parsedTag.TagText, string.Empty);
                 }
 
-                i += parsedTag.TagText.Length - 1;
+                i += parsedTag.Length - 1;
             }
         }
 
