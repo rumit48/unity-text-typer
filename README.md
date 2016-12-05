@@ -19,7 +19,7 @@ if (Text.IsSkippable())
 Features
 --------
 - **Support Text Speed**: ```<speed=0.05>Hello! my name is</speed>typetext.```
-- **Support uGUI Tags**: ```<b><i><size><color>...```
+- **Support uGUI Tags**: ```<b>,<i>,<size>,<color>,...```
 - **Support Skiping**
 - **Support OnComplete Callback**
 - **Unity4/5 Compatible**
