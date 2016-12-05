@@ -17,7 +17,7 @@ public class TypeTextComponent : MonoBehaviour
     private float defaultPrintDelay = 0.05f;
 
     [SerializeField]
-    private UnityEvent printCompleted;
+    private UnityEvent printCompleted = new UnityEvent();
 
     private Text textComponent;
     private string printingText;
@@ -147,7 +147,7 @@ public class TypeTextComponent : MonoBehaviour
     private void ApplyTag(RichTextTag tag)
     {
         // Push or Pop the tag from the outstanding tags stack.
-        if (!tag.IsClosignTag)
+        if (!tag.IsClosingTag)
         {
             this.outstandingTags.Push(tag);
         }
@@ -172,10 +172,16 @@ public class TypeTextComponent : MonoBehaviour
             float speed = 0.0f;
             try
             {
-                speed = tag.IsClosignTag ? this.defaultPrintDelay : float.Parse(tag.Parameter);
+                speed = tag.IsClosingTag ? this.defaultPrintDelay : float.Parse(tag.Parameter);
             }
-            catch
+            catch (System.FormatException e)
             {
+                var warning = string.Format(
+                                  "Invalid paramter format found in tag [{0}]. Parameter [{1}] does not parse to a float. Exception: {2}",
+                                  tag,
+                                  tag.Parameter,
+                                  e);
+                Debug.LogWarning(warning, this);
                 speed = this.defaultPrintDelay;
             }
 

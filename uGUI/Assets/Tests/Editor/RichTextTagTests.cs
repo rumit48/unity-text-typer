@@ -16,7 +16,7 @@ public class RichTextTagTests
         //Assert
         Assert.AreEqual(tag, richTextTag.TagText);
         Assert.AreEqual("b", richTextTag.TagType);
-        Assert.IsFalse(richTextTag.IsClosignTag);
+        Assert.IsFalse(richTextTag.IsClosingTag);
         Assert.AreEqual("</b>", richTextTag.ClosingTagText);
         Assert.AreEqual(string.Empty, richTextTag.Parameter);
     }
@@ -33,7 +33,7 @@ public class RichTextTagTests
         //Assert
         Assert.AreEqual(tag, richTextTag.TagText);
         Assert.AreEqual("color", richTextTag.TagType);
-        Assert.IsFalse(richTextTag.IsClosignTag);
+        Assert.IsFalse(richTextTag.IsClosingTag);
         Assert.AreEqual("</color>", richTextTag.ClosingTagText);
         Assert.AreEqual("#FFFFFFFF", richTextTag.Parameter);
     }
@@ -50,7 +50,7 @@ public class RichTextTagTests
         //Assert
         Assert.AreEqual(tag, richTextTag.TagText);
         Assert.AreEqual("color", richTextTag.TagType);
-        Assert.IsTrue(richTextTag.IsClosignTag);
+        Assert.IsTrue(richTextTag.IsClosingTag);
         Assert.AreEqual("</color>", richTextTag.ClosingTagText);
         Assert.AreEqual(string.Empty, richTextTag.Parameter);
     }
