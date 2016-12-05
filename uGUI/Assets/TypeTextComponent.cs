@@ -4,20 +4,24 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Text))]
+/// <summary>
+/// Type text component types out Text one character at a time.
+/// </summary>
 public class TypeTextComponent : MonoBehaviour
 {
     public delegate void OnComplete();
 
-    private static readonly List<string> uGUITagTypes = new List<string> { "b", "i", "size", "color" };
-    private static readonly List<string> customTagTypes = new List<string> { "speed" };
+    private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color" };
+    private static readonly List<string> CustomTagTypes = new List<string> { "speed" };
 
     [SerializeField]
-    private float defaultSpeed = 0.05f;
+    private float defaultPrintDelay = 0.05f;
 
     private Text textComponent;
+
+    private string printingText;
     private string displayedText;
-    private string finalText;
-    private float currentSpeed;
+    private float currentPrintDelay;
     private Coroutine typeTextCoroutine;
     private Stack<RichTextTag> outstandingTags;
     private OnComplete onCompleteCallback;
@@ -35,43 +39,67 @@ public class TypeTextComponent : MonoBehaviour
         }
     }
 
-    public void Awake()
+    /// <summary>
+    /// Called by Unity when the component is created.
+    /// </summary>
+    protected void Awake()
     {
         this.outstandingTags = new Stack<RichTextTag>();
     }
 
-    public void SetText(string text, float speed = -1)
+    public void SetText(string text, float printDelay = -1)
     {
-        this.defaultSpeed = speed > 0 ? speed : this.defaultSpeed;
-        this.finalText = RemoveCustomTags(text);
-        this.TextComponent.text = "";
+        this.defaultPrintDelay = printDelay > 0 ? printDelay : this.defaultPrintDelay;
+        this.printingText = text;
 
         if (this.typeTextCoroutine != null)
         {
-            StopCoroutine(this.typeTextCoroutine);
+            this.StopCoroutine(this.typeTextCoroutine);
         }
 
-        this.typeTextCoroutine = StartCoroutine(TypeText(text));
+        this.typeTextCoroutine = this.StartCoroutine(this.TypeText(text));
     }
 
     public void SkipTypeText()
     {
         if (this.typeTextCoroutine != null)
         {
-            StopCoroutine(typeTextCoroutine);
+            this.StopCoroutine(this.typeTextCoroutine);
             this.typeTextCoroutine = null;
         }
 
         this.outstandingTags.Clear();
-        this.textComponent.text = finalText;
+        this.TextComponent.text = RemoveCustomTags(this.printingText);
 
         this.OnTypewritingComplete();
     }
 
-    public IEnumerator TypeText(string text)
+    public bool IsSkippable()
     {
-        this.displayedText = "";
-        this.currentSpeed = this.defaultSpeed;
+        return this.typeTextCoroutine != null;
+    }
+
+    public void SetOnComplete(OnComplete onComplete)
+    {
+        this.onCompleteCallback = onComplete;
+    }
+
+    private static string RemoveCustomTags(string text)
+    {
+        var textWithoutTags = text;
+        foreach (var tagType in CustomTagTypes)
+        {
+            textWithoutTags = RichTextTag.RemoveTagsFromString(textWithoutTags, tagType);
+        }
+
+        return textWithoutTags;
+    }
+
+    private IEnumerator TypeText(string text)
+    {
+        this.displayedText = string.Empty;
+        this.TextComponent.text = string.Empty;
+        this.currentPrintDelay = this.defaultPrintDelay;
 
         for (var i = 0; i < text.Length; i++)
         {
@@ -86,11 +114,11 @@ public class TypeTextComponent : MonoBehaviour
             }
 
             this.displayedText += text[i];
-            textComponent.text = this.displayedText;
+            this.TextComponent.text = this.displayedText;
 
             this.CloseOutstandingTags();
 
-            yield return new WaitForSeconds(this.currentSpeed);
+            yield return new WaitForSeconds(this.currentPrintDelay);
         }
 
         this.typeTextCoroutine = null;
@@ -99,6 +127,7 @@ public class TypeTextComponent : MonoBehaviour
 
     private void ApplyTag(RichTextTag tag)
     {
+        // Push or Pop the tag from the outstanding tags stack.
         if (!tag.IsClosignTag)
         {
             this.outstandingTags.Push(tag);
@@ -118,26 +147,27 @@ public class TypeTextComponent : MonoBehaviour
             }
         }
 
+        // Execute Custom Tags here
         if (tag.TagType == "speed")
         {
             float speed = 0.0f;
             try
             {
-                speed = tag.IsClosignTag ? this.defaultSpeed : float.Parse(tag.Parameter);
+                speed = tag.IsClosignTag ? this.defaultPrintDelay : float.Parse(tag.Parameter);
             }
             catch
             {
-                speed = this.defaultSpeed;
+                speed = this.defaultPrintDelay;
             }
 
-            this.currentSpeed = speed;
+            this.currentPrintDelay = speed;
         }
 
         // We only want to add in text of tags for elements that Unity will parse
         // in its RichText enabled Text widget
-        if (uGUITagTypes.Contains(tag.TagType))
+        if (UnityTagTypes.Contains(tag.TagType))
         {
-            displayedText += tag.TagText;
+            this.displayedText += tag.TagText;
         }
     }
 
@@ -147,32 +177,11 @@ public class TypeTextComponent : MonoBehaviour
         {
             // We only need to add back in Unity tags, since they've been
             // added to the text and Unity expects closing tags.
-            if (uGUITagTypes.Contains(tag.TagType))
+            if (UnityTagTypes.Contains(tag.TagType))
             {
-                textComponent.text = string.Concat(textComponent.text, tag.ClosingTagText);
+                this.textComponent.text = string.Concat(this.textComponent.text, tag.ClosingTagText);
             }
         }
-    }
-
-    private string RemoveCustomTags(string text)
-    {
-        var textWithoutTags = text;
-        foreach (var tagType in customTagTypes)
-        {
-            textWithoutTags = RichTextTag.RemoveTagsFromString(textWithoutTags, tagType);
-        }
-
-        return textWithoutTags;
-    }
-
-    public bool IsSkippable()
-    {
-        return typeTextCoroutine != null;
-    }
-
-    public void SetOnComplete(OnComplete onComplete)
-    {
-        onCompleteCallback = onComplete;
     }
 
     private void OnTypewritingComplete()
@@ -219,5 +228,4 @@ public static class TypeTextComponentUtility
 
         typeText.SkipTypeText();
     }
-
 }
