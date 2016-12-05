@@ -2,29 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
-[RequireComponent(typeof(Text))]
 /// <summary>
 /// Type text component types out Text one character at a time.
 /// </summary>
+[RequireComponent(typeof(Text))]
 public class TypeTextComponent : MonoBehaviour
 {
-    public delegate void OnComplete();
-
     private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color" };
     private static readonly List<string> CustomTagTypes = new List<string> { "speed" };
 
     [SerializeField]
     private float defaultPrintDelay = 0.05f;
 
-    private Text textComponent;
+    [SerializeField]
+    private UnityEvent printCompleted;
 
+    private Text textComponent;
     private string printingText;
     private string displayedText;
     private float currentPrintDelay;
     private Coroutine typeTextCoroutine;
     private Stack<RichTextTag> outstandingTags;
-    private OnComplete onCompleteCallback;
 
     private Text TextComponent
     {
@@ -36,6 +36,14 @@ public class TypeTextComponent : MonoBehaviour
             }
 
             return this.textComponent;
+        }
+    }
+
+    public UnityEvent PrintCompleted
+    {
+        get
+        {
+            return this.printCompleted;
         }
     }
 
@@ -77,11 +85,6 @@ public class TypeTextComponent : MonoBehaviour
     public bool IsSkippable()
     {
         return this.typeTextCoroutine != null;
-    }
-
-    public void SetOnComplete(OnComplete onComplete)
-    {
-        this.onCompleteCallback = onComplete;
     }
 
     private static string RemoveCustomTags(string text)
@@ -186,16 +189,16 @@ public class TypeTextComponent : MonoBehaviour
 
     private void OnTypewritingComplete()
     {
-        if (this.onCompleteCallback != null)
+        if (this.PrintCompleted != null)
         {
-            this.onCompleteCallback.Invoke();
+            this.PrintCompleted.Invoke();
         }
     }
 }
 
 public static class TypeTextComponentUtility
 {
-    public static void TypeText(this Text label, string text, float speed = 0.05f, TypeTextComponent.OnComplete onComplete = null)
+    public static void TypeText(this Text label, string text, float speed = 0.05f, UnityAction onComplete = null)
     {
         var typeText = label.GetComponent<TypeTextComponent>();
         if (typeText == null)
@@ -204,7 +207,7 @@ public static class TypeTextComponentUtility
         }
 
         typeText.SetText(text, speed);
-        typeText.SetOnComplete(onComplete);
+        typeText.PrintCompleted.AddListener(onComplete);
     }
 
     public static bool IsSkippable(this Text label)
