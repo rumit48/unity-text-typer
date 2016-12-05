@@ -1,4 +1,4 @@
-﻿namespace RedBlueGames.Tools.TypeText
+﻿namespace RedBlueGames.Tools.TextTyper
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -10,16 +10,22 @@
     /// Type text component types out Text one character at a time. Heavily adapted from synchrok's GitHub project.
     /// </summary>
     [RequireComponent(typeof(Text))]
-    public class TypeTextComponent : MonoBehaviour
+    public class TextTyper : MonoBehaviour
     {
         private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color" };
         private static readonly List<string> CustomTagTypes = new List<string> { "speed" };
 
         [SerializeField]
+        [Tooltip("The default delay between characters.")]
         private float defaultPrintDelay = 0.05f;
 
         [SerializeField]
+        [Tooltip("Event that's called when the text has finished printing.")]
         private UnityEvent printCompleted = new UnityEvent();
+
+        [SerializeField]
+        [Tooltip("Event called when a character is printed. Inteded for audio callbacks.")]
+        private CharacterPrintedEvent characterPrinted = new CharacterPrintedEvent();
 
         private Text textComponent;
         private string printingText;
@@ -37,6 +43,18 @@
             get
             {
                 return this.printCompleted;
+            }
+        }
+
+        /// <summary>
+        /// Gets the CharacterPrinted event, which includes a string for the character that was printed.
+        /// </summary>
+        /// <value>The character printed event.</value>
+        public CharacterPrintedEvent CharacterPrinted
+        {
+            get
+            {
+                return this.characterPrinted;
             }
         }
 
@@ -134,10 +152,13 @@
                     continue;
                 }
 
-                this.displayedText += text[i];
+                var printedCharacter = text[i];
+                this.displayedText += printedCharacter;
                 this.TextComponent.text = this.displayedText;
 
                 this.CloseOutstandingTags();
+
+                this.OnCharacterPrinted(printedCharacter.ToString());
 
                 yield return new WaitForSeconds(this.currentPrintDelay);
             }
@@ -211,12 +232,28 @@
             }
         }
 
+        private void OnCharacterPrinted(string printedCharacter)
+        {
+            if (this.CharacterPrinted != null)
+            {
+                this.CharacterPrinted.Invoke(printedCharacter);
+            }
+        }
+
         private void OnTypewritingComplete()
         {
             if (this.PrintCompleted != null)
             {
                 this.PrintCompleted.Invoke();
             }
+        }
+
+        /// <summary>
+        /// Event that signals a Character has been printed to the Text component.
+        /// </summary>
+        [System.Serializable]
+        public class CharacterPrintedEvent : UnityEvent<string>
+        {
         }
     }
 }

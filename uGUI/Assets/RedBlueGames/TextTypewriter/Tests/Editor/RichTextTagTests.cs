@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using NUnit.Framework;
-using RedBlueGames.Tools.TypeText;
+using RedBlueGames.Tools.TextTyper;
 
 public class RichTextTagTests
 {

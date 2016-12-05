@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using RedBlueGames.Tools.TypeText;
+using RedBlueGames.Tools.TextTyper;
 using UnityEngine.UI;
 
+/// <summary>
+/// Class that tests TextTyper and shows how to interface with it.
+/// </summary>
 public class Test_UGUI : MonoBehaviour
 {
+    public AudioClip printSoundEffect;
     public Text text;
     private Queue<string> scripts = new Queue<string>();
 
@@ -27,6 +31,8 @@ public class Test_UGUI : MonoBehaviour
         }
 
         text.TypeText(scripts.Dequeue(), onComplete: () => Debug.Log("TypeText Complete"));
+        var textTyper = text.GetComponent<TextTyper>();
+        textTyper.CharacterPrinted.AddListener(this.PlayPrintSound);
     }
 
     public void OnClickWindow()
@@ -66,5 +72,23 @@ public class Test_UGUI : MonoBehaviour
         {
             Debug.Log("Tag: " + tag.ToString());
         }
+    }
+
+    private void PlayPrintSound(string printedCharacter)
+    {
+        // Do not play a sound for whitespace
+        if (printedCharacter == " " || printedCharacter == "\n")
+        {
+            return;
+        }
+
+        var audioSource = this.GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = this.gameObject.AddComponent<AudioSource>();
+        }
+
+        audioSource.clip = this.printSoundEffect;
+        audioSource.Play();
     }
 }

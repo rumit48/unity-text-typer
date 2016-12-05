@@ -1,4 +1,4 @@
-﻿namespace RedBlueGames.Tools.TypeText
+﻿namespace RedBlueGames.Tools.TextTyper
 {
     using System.Collections;
     using UnityEngine;
@@ -6,9 +6,9 @@
     using UnityEngine.UI;
 
     /// <summary>
-    /// TypeTextComponentUtility is a helper class that extends Text component to add TypeText functionality.
+    /// TextTyperUtility is a helper class that extends Text component to add TextTyper functionality.
     /// </summary>
-    public static class TypeTextComponentUtility
+    public static class TextTyperUtility
     {
         /// <summary>
         /// Types the specified text into the Text component.
@@ -19,10 +19,10 @@
         /// <param name="onComplete">On complete callback.</param>
         public static void TypeText(this Text label, string text, float delayPerCharacter = 0.05f, UnityAction onComplete = null)
         {
-            var typeText = label.GetComponent<TypeTextComponent>();
+            var typeText = label.GetComponent<TextTyper>();
             if (typeText == null)
             {
-                typeText = label.gameObject.AddComponent<TypeTextComponent>();
+                typeText = label.gameObject.AddComponent<TextTyper>();
             }
 
             typeText.TypeText(text, delayPerCharacter);
@@ -36,10 +36,10 @@
         /// <param name="label">Text component label to type into.</param>
         public static bool IsSkippable(this Text label)
         {
-            var typeText = label.GetComponent<TypeTextComponent>();
+            var typeText = label.GetComponent<TextTyper>();
             if (typeText == null)
             {
-                typeText = label.gameObject.AddComponent<TypeTextComponent>();
+                typeText = label.gameObject.AddComponent<TextTyper>();
             }
 
             return typeText.IsSkippable();
@@ -51,10 +51,10 @@
         /// <param name="label">Text component label to type into.</param>
         public static void SkipTypeText(this Text label)
         {
-            var typeText = label.GetComponent<TypeTextComponent>();
+            var typeText = label.GetComponent<TextTyper>();
             if (typeText == null)
             {
-                typeText = label.gameObject.AddComponent<TypeTextComponent>();
+                typeText = label.gameObject.AddComponent<TextTyper>();
             }
 
             typeText.Skip();
