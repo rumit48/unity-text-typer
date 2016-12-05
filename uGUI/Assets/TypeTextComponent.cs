@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 /// <summary>
 /// Type text component types out Text one character at a time.
@@ -26,6 +26,18 @@ public class TypeTextComponent : MonoBehaviour
     private Coroutine typeTextCoroutine;
     private Stack<RichTextTag> outstandingTags;
 
+    /// <summary>
+    /// Gets the PrintCompleted callback event.
+    /// </summary>
+    /// <value>The print completed callback event.</value>
+    public UnityEvent PrintCompleted
+    {
+        get
+        {
+            return this.printCompleted;
+        }
+    }
+
     private Text TextComponent
     {
         get
@@ -39,23 +51,12 @@ public class TypeTextComponent : MonoBehaviour
         }
     }
 
-    public UnityEvent PrintCompleted
-    {
-        get
-        {
-            return this.printCompleted;
-        }
-    }
-
     /// <summary>
-    /// Called by Unity when the component is created.
+    /// Types the text into the Text component character by character, using the specified (optional) print delay per character.
     /// </summary>
-    protected void Awake()
-    {
-        this.outstandingTags = new Stack<RichTextTag>();
-    }
-
-    public void SetText(string text, float printDelay = -1)
+    /// <param name="text">Text to type.</param>
+    /// <param name="printDelay">Print delay (in seconds) per character.</param>
+    public void TypeText(string text, float printDelay = -1)
     {
         this.defaultPrintDelay = printDelay > 0 ? printDelay : this.defaultPrintDelay;
         this.printingText = text;
@@ -65,10 +66,13 @@ public class TypeTextComponent : MonoBehaviour
             this.StopCoroutine(this.typeTextCoroutine);
         }
 
-        this.typeTextCoroutine = this.StartCoroutine(this.TypeText(text));
+        this.typeTextCoroutine = this.StartCoroutine(this.TypeTextCharByChar(text));
     }
 
-    public void SkipTypeText()
+    /// <summary>
+    /// Skips the typing to the end.
+    /// </summary>
+    public void Skip()
     {
         if (this.typeTextCoroutine != null)
         {
@@ -82,9 +86,21 @@ public class TypeTextComponent : MonoBehaviour
         this.OnTypewritingComplete();
     }
 
+    /// <summary>
+    /// Determines whether this instance is skippable.
+    /// </summary>
+    /// <returns><c>true</c> if this instance is skippable; otherwise, <c>false</c>.</returns>
     public bool IsSkippable()
     {
         return this.typeTextCoroutine != null;
+    }
+
+    /// <summary>
+    /// Called by Unity when the component is created.
+    /// </summary>
+    protected void Awake()
+    {
+        this.outstandingTags = new Stack<RichTextTag>();
     }
 
     private static string RemoveCustomTags(string text)
@@ -98,7 +114,7 @@ public class TypeTextComponent : MonoBehaviour
         return textWithoutTags;
     }
 
-    private IEnumerator TypeText(string text)
+    private IEnumerator TypeTextCharByChar(string text)
     {
         this.displayedText = string.Empty;
         this.TextComponent.text = string.Empty;
@@ -193,42 +209,5 @@ public class TypeTextComponent : MonoBehaviour
         {
             this.PrintCompleted.Invoke();
         }
-    }
-}
-
-public static class TypeTextComponentUtility
-{
-    public static void TypeText(this Text label, string text, float speed = 0.05f, UnityAction onComplete = null)
-    {
-        var typeText = label.GetComponent<TypeTextComponent>();
-        if (typeText == null)
-        {
-            typeText = label.gameObject.AddComponent<TypeTextComponent>();
-        }
-
-        typeText.SetText(text, speed);
-        typeText.PrintCompleted.AddListener(onComplete);
-    }
-
-    public static bool IsSkippable(this Text label)
-    {
-        var typeText = label.GetComponent<TypeTextComponent>();
-        if (typeText == null)
-        {
-            typeText = label.gameObject.AddComponent<TypeTextComponent>();
-        }
-
-        return typeText.IsSkippable();
-    }
-
-    public static void SkipTypeText(this Text label)
-    {
-        var typeText = label.GetComponent<TypeTextComponent>();
-        if (typeText == null)
-        {
-            typeText = label.gameObject.AddComponent<TypeTextComponent>();
-        }
-
-        typeText.SkipTypeText();
     }
 }
