@@ -22,3 +22,7 @@ sysinfo.txt
 
 # MacOS ignores
 *.DS_Store
+
+# StyleCop local cache files
+*.Cache
+*.Cache.meta
