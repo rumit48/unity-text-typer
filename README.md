@@ -1,17 +1,13 @@
 TypeText
 =========================
 
-Very simple text typing effect for Unity (both uGUI and NGUI)
+TypeText is a text typing effect component for Unity. Adapted by RedBlueGames from synchrok's GitHub project (https://github.com/synchrok/TypeText).
 
 At a Glance
 -----------
 - **uGUI:**
 ```csharp
 Text.TypeText("Some text", 0.05f);
-```
-- **NGUI:**
-```csharp
-UILabel.TypeText("Some text", 0.05f);
 ```
 - **Common:**
 ```csharp
@@ -22,14 +18,12 @@ if (Text.IsSkippable())
 
 Features
 --------
-- **Support Text Speed**: ```[speed=0.05]Hello! my name is[speed=0.2]typetext.```
+- **Support Text Speed**: ```<speed=0.05>Hello! my name is</speed>typetext.```
 - **Support uGUI Tags**: ```<b><i><size><color>...```
-- **Support NGUI Tags**: ```[b][i][s][u][sup][sub][FFFFFF][-]...```
-- **Support Skip**
+- **Support Skiping**
 - **Support OnComplete Callback**
 - **Unity4/5 Compatible**
 - **Very Simple**
-
 
 Screenshots
 --------
