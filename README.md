@@ -20,7 +20,7 @@ Features
 --------
 - **Support Text Speed**: ```<speed=0.05>Hello! my name is</speed>typetext.```
 - **Support uGUI Tags**: ```<b>,<i>,<size>,<color>,...```
-- **Support Skiping**
+- **Support Skipping**
 - **Support OnComplete Callback**
 - **Unity4/5 Compatible**
 - **Very Simple**
