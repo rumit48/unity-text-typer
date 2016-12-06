@@ -26,7 +26,10 @@
             }
 
             typeText.TypeText(text, delayPerCharacter);
-            typeText.PrintCompleted.AddListener(onComplete);
+            if (onComplete != null)
+            {
+                typeText.PrintCompleted.AddListener(onComplete);
+            }
         }
 
         /// <summary>
