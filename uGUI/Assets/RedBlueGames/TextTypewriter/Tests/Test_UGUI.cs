@@ -15,6 +15,7 @@ public class Test_UGUI : MonoBehaviour
 
     public void Start()
     {
+        scripts.Enqueue("When printing extremely long words, notice how they wrap as they are printed.");
         scripts.Enqueue("Hello! My name is<speed=0.5>... </speed>NPC. Got it, bub?");
         scripts.Enqueue("You can <b>use</b> <i>uGUI</i> <size=40>text</size> <size=20>tag</size> and <color=#ff0000ff>color</color> tag <color=#00ff00ff>like this</color>.");
         scripts.Enqueue("bold <b>text</b> test <b>bold</b> text <b>test</b>");

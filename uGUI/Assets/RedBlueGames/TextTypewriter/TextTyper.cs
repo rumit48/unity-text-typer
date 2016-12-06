@@ -152,11 +152,34 @@
                     continue;
                 }
 
+                // Add in the current character
                 var printedCharacter = text[i];
                 this.displayedText += printedCharacter;
-                this.TextComponent.text = this.displayedText;
 
-                this.CloseOutstandingTags();
+                // Hide the remaining characters
+                string hiddenText = remainingText.Remove(0, 1);
+                if (!string.IsNullOrEmpty(hiddenText))
+                {
+                    // Strip outstanding close tags because they confuse the end tags we will add
+                    foreach (var tag in this.outstandingTags)
+                    {
+                        var firstOccurance = hiddenText.IndexOf(tag.ClosingTagText);
+                        hiddenText = hiddenText.Remove(firstOccurance, tag.ClosingTagText.Length);
+                    }
+
+                    // Remove color because you can't embed color nodes
+                    hiddenText = RichTextTag.RemoveTagsFromString(hiddenText, "color");
+
+                    // Add the transparent color around the string
+                    hiddenText = RemoveCustomTags(hiddenText);
+                    hiddenText = string.Concat("<color=#00000000>", hiddenText, "</color>");
+                }
+
+                // Close the ndoes that are outstanding
+                var printText = AddOutstandingClosingTagsToString(this.displayedText);
+
+                // Apply the text
+                this.TextComponent.text = string.Concat(printText, hiddenText);
 
                 this.OnCharacterPrinted(printedCharacter.ToString());
 
@@ -219,17 +242,21 @@
             }
         }
 
-        private void CloseOutstandingTags()
+        private string AddOutstandingClosingTagsToString(string text)
         {
+            var textWithTags = text;
+
+            // We only need to add back in Unity tags, since they've been
+            // added to the text and Unity expects closing tags.
             foreach (var tag in this.outstandingTags)
             {
-                // We only need to add back in Unity tags, since they've been
-                // added to the text and Unity expects closing tags.
                 if (UnityTagTypes.Contains(tag.TagType))
                 {
-                    this.textComponent.text = string.Concat(this.textComponent.text, tag.ClosingTagText);
+                    textWithTags = string.Concat(textWithTags, tag.ClosingTagText);
                 }
             }
+
+            return textWithTags;
         }
 
         private void OnCharacterPrinted(string printedCharacter)

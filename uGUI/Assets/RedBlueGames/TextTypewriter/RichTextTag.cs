@@ -135,7 +135,7 @@
 
             var closingDelimeterIndex = text.IndexOf(RichTextTag.CloseNodeDelimeter);
 
-            // No closingDlimtere found. Might want to throw.
+            // No closingDelimeter found. Might want to throw.
             if (closingDelimeterIndex < 0)
             {
                 return null;
