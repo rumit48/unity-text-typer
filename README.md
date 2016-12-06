@@ -1,7 +1,7 @@
-TypeText
+TextTyper
 =========================
 
-TypeText is a text typing effect component for Unity. Adapted by RedBlueGames from synchrok's GitHub project (https://github.com/synchrok/TypeText).
+TextTyper is a text typing effect component for Unity. Adapted by RedBlueGames from synchrok's GitHub project (https://github.com/synchrok/TypeText).
 
 At a Glance
 -----------
