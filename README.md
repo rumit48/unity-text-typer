@@ -18,10 +18,11 @@ if (Text.IsSkippable())
 
 Features
 --------
-- **Support Text Speed**: ```<speed=0.05>Hello! my name is</speed>typetext.```
-- **Support uGUI Tags**: ```<b>,<i>,<size>,<color>,...```
-- **Support Skipping**
-- **Support OnComplete Callback**
+- **Dynamic Text Speed**: ```<speed=0.05>Hello! my name is</speed>typetext.```
+- **uGUI Rich Text Tags**: ```<b>,<i>,<size>,<color>,...```
+- **Skipping**
+- **OnComplete Callback**
+- **OnCharacterPrinted Callback (for audio)**
 - **Unity4/5 Compatible**
 - **Very Simple**
 
