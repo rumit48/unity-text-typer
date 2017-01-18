@@ -1,20 +1,7 @@
 TextTyper
 =========================
 
-TextTyper is a text typing effect component for Unity. Adapted by RedBlueGames from synchrok's GitHub project (https://github.com/synchrok/TypeText).
-
-At a Glance
------------
-- **uGUI:**
-```csharp
-Text.TypeText("Some text", 0.05f);
-```
-- **Common:**
-```csharp
-if (Text.IsSkippable())
-  Text.SkipTypeText();
-```
-
+TextTyper is a text typing effect component for Unity. TextTyper prints out characters one by one to a uGUI Text component. Adapted by RedBlueGames from synchrok's GitHub project (https://github.com/synchrok/TypeText).
 
 Features
 --------
