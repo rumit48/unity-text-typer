@@ -3,6 +3,10 @@ TextTyper
 
 TextTyper is a text typing effect component for Unity. TextTyper prints out characters one by one to a uGUI Text component. Adapted by RedBlueGames from synchrok's GitHub project (https://github.com/synchrok/TypeText).
 
+It's easy to find other examples of Text printing components, but TextTyper provides two major differences:
+* Correct wrapping as characters are printed
+* Support for Rich Text Tags
+
 Features
 --------
 - **Dynamic Text Speed**: ```<speed=0.05>Hello! my name is</speed>typetext.```
