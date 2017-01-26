@@ -1,4 +1,4 @@
-TextTyper
+Unity-TextTyper
 =========================
 
 TextTyper is a text typing effect component for Unity. TextTyper prints out characters one by one to a uGUI Text component. Adapted by RedBlueGames from synchrok's GitHub project (https://github.com/synchrok/TypeText).
@@ -14,8 +14,7 @@ Features
 - **Skipping**
 - **OnComplete Callback**
 - **OnCharacterPrinted Callback (for audio)**
-- **Unity4/5 Compatible**
-- **Very Simple**
+- **Unity 4/5 Compatible**
 
 Screenshots
 --------
