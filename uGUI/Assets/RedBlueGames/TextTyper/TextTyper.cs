@@ -12,12 +12,23 @@
     [RequireComponent(typeof(Text))]
     public class TextTyper : MonoBehaviour
     {
-        private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color" };
-        private static readonly List<string> CustomTagTypes = new List<string> { "speed" };
+        /// <summary>
+        /// The print delay setting. Could make this an option some day, for fast readers.
+        /// </summary>
+        private const float PrintDelaySetting = 0.02f;
 
-        [SerializeField]
-        [Tooltip("The default delay between characters.")]
-        private float defaultPrintDelay = 0.05f;
+        private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color" };
+        private static readonly List<string> CustomTagTypes = new List<string> { "delay" };
+
+        // Characters that are considered punctuation in this language. TextTyper pauses on these characters
+        // a bit longer by default. Could be a setting sometime since this doesn't localize.
+        private readonly List<char> punctutationCharacters = new List<char>
+        {
+            '.',
+            ',',
+            '!',
+            '?'
+        };
 
         [SerializeField]
         [Tooltip("Event that's called when the text has finished printing.")]
@@ -30,7 +41,8 @@
         private Text textComponent;
         private string printingText;
         private string displayedText;
-        private float currentPrintDelay;
+        private float defaultPrintDelay;
+        private float overridePrintDelay;
         private Coroutine typeTextCoroutine;
         private Stack<RichTextTag> outstandingTags;
 
@@ -78,7 +90,7 @@
         /// <param name="printDelay">Print delay (in seconds) per character.</param>
         public void TypeText(string text, float printDelay = -1)
         {
-            this.defaultPrintDelay = printDelay > 0 ? printDelay : this.defaultPrintDelay;
+            this.defaultPrintDelay = printDelay > 0 ? printDelay : PrintDelaySetting;
             this.printingText = text;
 
             if (this.typeTextCoroutine != null)
@@ -138,7 +150,6 @@
         {
             this.displayedText = string.Empty;
             this.TextComponent.text = string.Empty;
-            this.currentPrintDelay = this.defaultPrintDelay;
 
             for (var i = 0; i < text.Length; i++)
             {
@@ -176,14 +187,14 @@
                 }
 
                 // Close the ndoes that are outstanding
-                var printText = AddOutstandingClosingTagsToString(this.displayedText);
+                var printText = this.AddOutstandingClosingTagsToString(this.displayedText);
 
                 // Apply the text
                 this.TextComponent.text = string.Concat(printText, hiddenText);
 
                 this.OnCharacterPrinted(printedCharacter.ToString());
 
-                yield return new WaitForSeconds(this.currentPrintDelay);
+                yield return new WaitForSeconds(this.GetPrintDelayForCharacter(printedCharacter));
             }
 
             this.typeTextCoroutine = null;
@@ -193,7 +204,7 @@
         private void ApplyTag(RichTextTag tag)
         {
             // Push or Pop the tag from the outstanding tags stack.
-            if (!tag.IsClosingTag)
+            if (tag.IsOpeningTag)
             {
                 this.outstandingTags.Push(tag);
             }
@@ -213,12 +224,11 @@
             }
 
             // Execute Custom Tags here
-            if (tag.TagType == "speed")
+            if (tag.TagType == "delay")
             {
-                float speed = 0.0f;
                 try
                 {
-                    speed = tag.IsClosingTag ? this.defaultPrintDelay : float.Parse(tag.Parameter);
+                    this.overridePrintDelay = tag.IsOpeningTag ? float.Parse(tag.Parameter) : 0.0f;
                 }
                 catch (System.FormatException e)
                 {
@@ -228,10 +238,8 @@
                                       tag.Parameter,
                                       e);
                     Debug.LogWarning(warning, this);
-                    speed = this.defaultPrintDelay;
+                    this.overridePrintDelay = 0.0f;
                 }
-
-                this.currentPrintDelay = speed;
             }
 
             // We only want to add in text of tags for elements that Unity will parse
@@ -257,6 +265,26 @@
             }
 
             return textWithTags;
+        }
+
+        private float GetPrintDelayForCharacter(char characterToPrint)
+        {
+            // First obey overridePrintDelay when set
+            if (this.overridePrintDelay > 0.0f)
+            {
+                return this.overridePrintDelay;
+            }
+
+            // Then get the default print delay for the current character
+            float punctuationDelay = this.defaultPrintDelay * 4.0f;
+            if (this.punctutationCharacters.Contains(characterToPrint))
+            {
+                return punctuationDelay;
+            }
+            else
+            {
+                return this.defaultPrintDelay;
+            }
         }
 
         private void OnCharacterPrinted(string printedCharacter)

@@ -84,6 +84,18 @@
         }
 
         /// <summary>
+        /// Gets a value indicating whether this instance is an opening tag.
+        /// </summary>
+        /// <value><c>true</c> if this instance is an opening tag; otherwise, <c>false</c>.</value>
+        public bool IsOpeningTag
+        {
+            get
+            {
+                return !this.IsClosingTag;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether this instance is a closing tag.
         /// </summary>
         /// <value><c>true</c> if this instance is a closing tag; otherwise, <c>false</c>.</value>
