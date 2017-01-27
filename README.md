@@ -9,12 +9,11 @@ It's easy to find other examples of Text printing components, but TextTyper prov
 
 Features
 --------
-- **Dynamic Text Speed**: ```<speed=0.05>Hello! my name is</speed>typetext.```
-- **uGUI Rich Text Tags**: ```<b>,<i>,<size>,<color>,...```
+- **Define Text Speed Per Character**: ```Mayday! <delay=0.05>S.O.S.</delay>```
+- **uGUI Rich Text Tags support**: ```<b>,<i>,<size>,<color>,...```
 - **Skipping**
 - **OnComplete Callback**
 - **OnCharacterPrinted Callback (for audio)**
-- **Unity 4/5 Compatible**
 
 Screenshots
 --------
