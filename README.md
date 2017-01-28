@@ -10,15 +10,16 @@ It's easy to find other examples of Text printing components, but TextTyper prov
 Features
 --------
 - **Define Text Speed Per Character**: ```Mayday! <delay=0.05>S.O.S.</delay>```
-- **uGUI Rich Text Tags support**: ```<b>,<i>,<size>,<color>,...```
-- **Skipping**
+- **Support for uGUI Rich Text Tags**: ```<b>,<i>,<size>,<color>,...```
+- **Additional delay for punctuation**
+- **Skip to end**
 - **OnComplete Callback**
 - **OnCharacterPrinted Callback (for audio)**
 
 Screenshots
 --------
-![TypeText Screenshot GIF](https://cloud.githubusercontent.com/assets/1309940/11761765/f897ff48-a112-11e5-97c7-f9bbdef387bc.gif)
-![TypeText Screenshot](https://cloud.githubusercontent.com/assets/1309940/11761719/06acaf9a-a111-11e5-8c35-1ec0bc06b470.PNG)
+![TypeText Screenshot GIF](https://github.com/redbluegames/unity-text-typer/blob/master/README-Images/ss_chat_watermarked.gif)
+Image of TextTyper in Sparklite (© RedBlueGames 2016)
 
 
 License and Credits
