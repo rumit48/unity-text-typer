@@ -8,6 +8,8 @@
     /// </summary>
     public class RichTextTag
     {
+        public static readonly RichTextTag ClearColorTag = new RichTextTag("<color=#00000000>");
+
         private const char OpeningNodeDelimeter = '<';
         private const char CloseNodeDelimeter = '>';
         private const char EndTagDelimeter = '/';

@@ -9,11 +9,23 @@
     /// <summary>
     /// Class that tests TextTyper and shows how to interface with it.
     /// </summary>
-    public class Test_UGUI : MonoBehaviour
+    public class TextTyperTester : MonoBehaviour
     {
-        public AudioClip printSoundEffect;
-        public Text text;
-        private Queue<string> scripts = new Queue<string>();
+        [SerializeField]
+        private AudioClip printSoundEffect;
+
+        [Header("UI References")]
+
+        [SerializeField]
+        private Text text;
+
+        [SerializeField]
+        private Button printNextButton;
+
+        [SerializeField]
+        private Button printNoSkipButton;
+
+        private Queue<string> dialogueLines = new Queue<string>();
 
         [SerializeField]
         [Tooltip("The text typer element to test typing with")]
@@ -24,27 +36,16 @@
             this.testTextTyper.PrintCompleted.AddListener(this.HandlePrintCompleted); 
             this.testTextTyper.CharacterPrinted.AddListener(this.HandleCharacterPrinted);
 
-            scripts.Enqueue("When printing extremely long words, notice how they no longer wrap as they are printed.");
-            scripts.Enqueue("Hello! My name is<delay=0.5>... </delay>NPC. Got it, bub?");
-            scripts.Enqueue("You can <b>use</b> <i>uGUI</i> <size=40>text</size> <size=20>tag</size> and <color=#ff0000ff>color</color> tag <color=#00ff00ff>like this</color>.");
-            scripts.Enqueue("bold <b>text</b> test <b>bold</b> text <b>test</b>");
-            scripts.Enqueue("You can <size=40>size 40</size> and <size=20>size 20</size>");
-            scripts.Enqueue("You can <color=#ff0000ff>color</color> tag <color=#00ff00ff>like this</color>.");
+            this.printNextButton.onClick.AddListener(this.HandlePrintNextClicked);
+            this.printNoSkipButton.onClick.AddListener(this.HandlePrintNoSkipClicked);
+
+            dialogueLines.Enqueue("Hello! My name is... <delay=0.5>NPC</delay>. Got it, bub?");
+            dialogueLines.Enqueue("You can <b>use</b> <i>uGUI</i> <size=40>text</size> <size=20>tag</size> and <color=#ff0000ff>color</color> tag <color=#00ff00ff>like this</color>.");
+            dialogueLines.Enqueue("bold <b>text</b> test <b>bold</b> text <b>test</b>");
+            dialogueLines.Enqueue("You can <size=40>size 40</size> and <size=20>size 20</size>");
+            dialogueLines.Enqueue("You can <color=#ff0000ff>color</color> tag <color=#00ff00ff>like this</color>.");
             ShowScript();
         }
-
-        public void OnClickWindow()
-        {
-            if (this.testTextTyper.IsSkippable())
-            {
-                this.testTextTyper.Skip();
-            }
-            else
-            {
-                ShowScript();
-            }
-        }
-
 
         public void Update()
         {
@@ -64,14 +65,31 @@
             }
         }
 
+        private void HandlePrintNextClicked()
+        {
+            if (this.testTextTyper.IsSkippable())
+            {
+                this.testTextTyper.Skip();
+            }
+            else
+            {
+                ShowScript();
+            }
+        }
+
+        private void HandlePrintNoSkipClicked()
+        {
+            ShowScript();
+        }
+
         private void ShowScript()
         {
-            if (scripts.Count <= 0)
+            if (dialogueLines.Count <= 0)
             {
                 return;
             }
 
-            this.testTextTyper.TypeText(scripts.Dequeue());
+            this.testTextTyper.TypeText(dialogueLines.Dequeue());
         }
 
         private void LogTag(RichTextTag tag)
