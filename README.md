@@ -37,11 +37,12 @@ How to Help
 -------
 The easiest way to help with the project is to just to use it! As you use it, you can submit bugs and feature requests through GitHub issues.
 
-Contributors and Credits
+Contributors
 -------
-- Typing sound effect (UITextDisplay.wav) provided by @kevinrmabie. Free for others to use, no attribution necessary.
-- Issues reported by JonathanGorr
+**Issue Resporters**
+- JonathanGorr
 
 License and Credits
 -------
 - **TypeText** is under MIT license. See the [LICENSE](LICENSE) file for more info.
+- Typing sound effect (UITextDisplay.wav) provided by @kevinrmabie. Free for others to use, no attribution necessary.
