@@ -7,6 +7,16 @@ It's easy to find other examples of Text printing components, but TextTyper prov
 * Correct wrapping as characters are printed
 * Support for Rich Text Tags
 
+How To Use
+--------
+To start TextTyping all you need to do is add the `TextTyper` component to a unity Text widget:
+
+1. Create a GameObject with a Unity UI Text Widget, as normal.
+2. Add a TextTyper component to the GameObject.
+3. Call the TextTyper component's public functions ```TypeText``` and ```Skip``` to print the desired text with the specified delay. We call these from a 3rd component we call `Talker`.
+
+You can optionally subscribe to the `PrintCompleted` and `CharacterPrinted` [UnityEvents](https://docs.unity3d.com/ScriptReference/Events.UnityEvent.AddListener.html) to add additional feedback like sounds and paging widgets.
+
 Features
 --------
 - **Define Text Speed Per Character**: ```Mayday! <delay=0.05>S.O.S.</delay>```
