@@ -67,7 +67,7 @@
 
         private void HandlePrintNextClicked()
         {
-            if (this.testTextTyper.IsSkippable())
+            if (this.testTextTyper.IsSkippable() && this.testTextTyper.IsTyping)
             {
                 this.testTextTyper.Skip();
             }

@@ -64,6 +64,18 @@
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="TextTyper"/> is currently printing text.
+        /// </summary>
+        /// <value><c>true</c> if printing; otherwise, <c>false</c>.</value>
+        public bool IsTyping
+        {
+            get
+            {
+                return this.typeTextCoroutine != null;
+            }
+        }
+
         private Text TextComponent
         {
             get
@@ -112,7 +124,8 @@
         /// <returns><c>true</c> if this instance is skippable; otherwise, <c>false</c>.</returns>
         public bool IsSkippable()
         {
-            return this.typeTextCoroutine != null;
+            // For now there's no way to configure this. Just make sure it's currently typing.
+            return this.IsTyping;
         }
 
         private void Cleanup()
