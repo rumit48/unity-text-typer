@@ -2,6 +2,7 @@
 {
     using System.Collections;
     using System.Collections.Generic;
+    using TMPro;
     using UnityEngine;
     using UnityEngine.Events;
     using UnityEngine.UI;
@@ -9,7 +10,7 @@
     /// <summary>
     /// Type text component types out Text one character at a time. Heavily adapted from synchrok's GitHub project.
     /// </summary>
-    [RequireComponent(typeof(Text))]
+    [RequireComponent(typeof(TextMeshProUGUI))]
     public sealed class TextTyper : MonoBehaviour
     {
         /// <summary>
@@ -35,7 +36,7 @@
         [Tooltip("Event called when a character is printed. Inteded for audio callbacks.")]
         private CharacterPrintedEvent characterPrinted = new CharacterPrintedEvent();
 
-        private Text textComponent;
+        private TextMeshProUGUI textComponent;
         private string printingText;
         private float defaultPrintDelay;
         private Coroutine typeTextCoroutine;
@@ -76,13 +77,13 @@
             }
         }
 
-        private Text TextComponent
+        private TextMeshProUGUI TextComponent
         {
             get
             {
                 if (this.textComponent == null)
                 {
-                    this.textComponent = this.GetComponent<Text>();
+                    this.textComponent = this.GetComponent<TextMeshProUGUI>();
                 }
 
                 return this.textComponent;
