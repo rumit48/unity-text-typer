@@ -7,6 +7,8 @@ It's easy to find other examples of Text printing components, but TextTyper prov
 * Correct wrapping as characters are printed
 * Support for Rich Text Tags
 
+**Note this verison of TextTyper requires TextMeshPro, which can be installed for free from the Package Manager in Unity 2018, or the Asset Store in older versions. If you want the version that is compatible with Unity's uGUI Text component, [this branch](https://github.com/redbluegames/unity-text-typer/tree/ugui-text-typer) or download [this release](https://github.com/redbluegames/unity-text-typer/releases/tag/v1.2).**
+
 How To Use
 --------
 To start TextTyping all you need to do is add the `TextTyper` component to a unity Text widget:
