@@ -18,9 +18,14 @@
         /// </summary>
         private const float PrintDelaySetting = 0.02f;
 
+        /// <summary>
+        /// Default delay setting will be multiplied by this when the character is a punctuation mark
+        /// </summary>
+        private const float PunctuationDelayMultiplier = 8f;
+
         // Characters that are considered punctuation in this language. TextTyper pauses on these characters
         // a bit longer by default. Could be a setting sometime since this doesn't localize.
-        private readonly List<char> punctutationCharacters = new List<char>
+        private static readonly List<char> punctutationCharacters = new List<char>
         {
             '.',
             ',',
@@ -39,8 +44,9 @@
         private TextMeshProUGUI textComponent;
         private string printingText;
         private float defaultPrintDelay;
+        private List<float> characterPrintDelays;
         private Coroutine typeTextCoroutine;
-
+        
         /// <summary>
         /// Gets the PrintCompleted callback event.
         /// </summary>
@@ -98,9 +104,10 @@
         public void TypeText(string text, float printDelay = -1)
         {
             this.Cleanup();
-
+            
             this.defaultPrintDelay = printDelay > 0 ? printDelay : PrintDelaySetting;
             this.printingText = text;
+            this.CalculatePrintDelays( text );
 
             this.typeTextCoroutine = this.StartCoroutine(this.TypeTextCharByChar(text));
         }
@@ -112,9 +119,7 @@
         {
             this.Cleanup();
 
-            var generator = new TypedTextGenerator();
-            var typedText = generator.GetCompletedText(this.printingText);
-            this.TextComponent.text = typedText.TextToPrint;
+            this.TextComponent.maxVisibleCharacters = int.MaxValue;
 
             this.OnTypewritingComplete();
         }
@@ -140,39 +145,66 @@
 
         private IEnumerator TypeTextCharByChar(string text)
         {
-            this.TextComponent.text = string.Empty;
+            string taglessText = TextTagParser.RemoveAllTags(text);
+            int totalPrintedChars = taglessText.Length;
 
-            var generator = new TypedTextGenerator();
-            TypedTextGenerator.TypedText typedText;
-            int printedCharCount = 0;
-            do
-            {
-                typedText = generator.GetTypedTextAt(text, printedCharCount);
-                this.TextComponent.text = typedText.TextToPrint;
-                this.OnCharacterPrinted(typedText.LastPrintedChar.ToString());
+            int currPrintedChars = 1;
+            this.TextComponent.text = TextTagParser.RemoveCustomTags(text);
+            do {
+                this.TextComponent.maxVisibleCharacters = currPrintedChars;
+                this.OnCharacterPrinted(taglessText[currPrintedChars - 1].ToString());
 
-                ++printedCharCount;
-
-                var delay = typedText.Delay > 0 ? typedText.Delay : this.GetPrintDelayForCharacter(typedText.LastPrintedChar);
-                yield return new WaitForSeconds(delay);
+                yield return new WaitForSeconds(characterPrintDelays[currPrintedChars - 1]);
+                ++currPrintedChars;
             }
-            while (!typedText.IsComplete);
+            while (currPrintedChars <= totalPrintedChars);
 
             this.typeTextCoroutine = null;
             this.OnTypewritingComplete();
         }
 
-        private float GetPrintDelayForCharacter(char characterToPrint)
+        /// <summary>
+        /// Calculates print delays for every visible character in the string.
+        /// Processes delay tags, punctuation delays, and default delays
+        /// </summary>
+        /// <param name="text">Full text string with tags</param>
+        private void CalculatePrintDelays(string text) 
         {
-            // Then get the default print delay for the current character
-            float punctuationDelay = this.defaultPrintDelay * 8.0f;
-            if (this.punctutationCharacters.Contains(characterToPrint))
+            characterPrintDelays = new List<float>(text.Length);
+
+            var textAsSymbolList = TextTagParser.CreateSymbolListFromText(text);
+
+            int printedCharCount = 0;
+            float nextDelay = this.defaultPrintDelay;
+            foreach (var symbol in textAsSymbolList) 
             {
-                return punctuationDelay;
-            }
-            else
-            {
-                return this.defaultPrintDelay;
+                if (symbol.IsTag)
+                {
+                    if (symbol.Tag.TagType == TextTagParser.CustomTags.Delay) 
+                    {
+                        if (symbol.Tag.IsClosingTag) 
+                        {
+                            nextDelay = this.defaultPrintDelay;
+                        } 
+                        else 
+                        {
+                            nextDelay = symbol.GetFloatParameter(this.defaultPrintDelay);
+                        }
+                    }
+                } 
+                else 
+                {
+                    printedCharCount++;
+
+                    if (punctutationCharacters.Contains(symbol.Character)) 
+                    {
+                        characterPrintDelays.Add(nextDelay * PunctuationDelayMultiplier);
+                    } 
+                    else 
+                    {
+                        characterPrintDelays.Add(nextDelay);
+                    }
+                }
             }
         }
 
