@@ -16,7 +16,7 @@
         {
             public const string Delay = "delay";
             public const string Shake = "shake";
-            public const string Animation = "animation";
+            public const string Curve = "curve";
         }
 
         private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color" };
@@ -24,7 +24,7 @@
         {
             CustomTags.Delay,
             CustomTags.Shake,
-            CustomTags.Animation
+            CustomTags.Curve
         };
         
         public static List<TextSymbol> CreateSymbolListFromText(string text)
