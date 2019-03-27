@@ -111,11 +111,17 @@
         /// <param name="printDelay">Print delay (in seconds) per character.</param>
         public void TypeText(string text, float printDelay = -1)
         {
-            this.Cleanup();
-            
+            this.CleanupCoroutine();
+
+            // Remove all existing TextAnimations
+            // TODO - Would be better to pool/reuse these components
+            foreach ( var anim in GetComponents<TextAnimation>( ) ) {
+                Destroy( anim );
+            }
+
             this.defaultPrintDelay = printDelay > 0 ? printDelay : PrintDelaySetting;
             this.printingText = text;
-            this.ProcessCustomTags( text );
+            this.ProcessCustomTags(text);
 
             this.typeTextCoroutine = this.StartCoroutine(this.TypeTextCharByChar(text));
         }
@@ -125,7 +131,7 @@
         /// </summary>
         public void Skip()
         {
-            this.Cleanup();
+            this.CleanupCoroutine();
 
             this.TextComponent.maxVisibleCharacters = int.MaxValue;
 
@@ -142,19 +148,12 @@
             return this.IsTyping;
         }
 
-        private void Cleanup()
+        private void CleanupCoroutine()
         {
             if (this.typeTextCoroutine != null)
             {
                 this.StopCoroutine(this.typeTextCoroutine);
                 this.typeTextCoroutine = null;
-            }
-
-            // Remove all existing TextAnimations
-            // TODO - Would be better to pool/reuse these components
-            foreach (var anim in GetComponents<TextAnimation>()) 
-            {
-                Destroy(anim);
             }
         }
 
