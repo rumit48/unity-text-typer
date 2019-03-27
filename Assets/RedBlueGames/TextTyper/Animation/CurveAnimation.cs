@@ -21,12 +21,11 @@
 
         private float timeAnimationStarted;
 
-        protected override void Start() 
+        protected override void OnEnable() 
         {
             this.curvePreset = curveLibrary[curvePresetKey];
             this.timeAnimationStarted = Time.time;
-
-            base.Start();
+            base.OnEnable();
         }
 
         protected override void Animate(int characterIndex, out Vector2 translation, out float rotation, out float scale) 
@@ -45,11 +44,7 @@
                 translation = new Vector2(xPos, yPos);
 
                 rotation = this.curvePreset.rotationCurve.Evaluate(t) * this.curvePreset.rotationMultiplier;
-
-                if (this.curvePreset.scaleMultiplier > 0f)
-                {
-                    scale = this.curvePreset.scaleCurve.Evaluate(t) * this.curvePreset.scaleMultiplier;
-                }
+                scale += this.curvePreset.scaleCurve.Evaluate(t) * this.curvePreset.scaleMultiplier;
             }
         }
     }

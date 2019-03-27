@@ -27,7 +27,7 @@
         public float rotationMultiplier;
 
         public AnimationCurve scaleCurve;
-        [Range( 0, 100 )]
+        [Range( 0, 10 )]
         public float scaleMultiplier;
     }
 

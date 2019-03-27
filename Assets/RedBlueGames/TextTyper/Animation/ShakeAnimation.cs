@@ -19,12 +19,12 @@
 
         private ShakePreset shakePreset;
 
-        protected override void Start() 
+        protected override void OnEnable() 
         {
             this.shakePreset = shakeLibrary[shakePresetKey];
-
-            base.Start();
+            base.OnEnable( );
         }
+
 
         protected override void Animate(int characterIndex, out Vector2 translation, out float rotation, out float scale) 
         {
