@@ -9,15 +9,19 @@
     [RequireComponent(typeof(TextMeshProUGUI))]
     public abstract class TextAnimation : MonoBehaviour 
     {
+        [SerializeField]
+        private bool playOnAwake;
 
         [SerializeField]
-        private bool animateAllCharacters;
+        protected int firstCharToAnimate;
+
+        [SerializeField]
+        protected int lastCharToAnimate;
 
         [SerializeField]
         [Tooltip("Event that's called when the animation has completed.")]
         private UnityEvent animationCompleted = new UnityEvent();
 
-        public bool[] CharacterShouldAnimate { get; private set; }
         private float lastAnimateTime;
         private const float frameRate = 15f;
         private static readonly float timeBetweenAnimates = 1f / frameRate;
@@ -62,6 +66,11 @@
 
             for (int i = 0; i < characterCount; i++) 
             {
+                if (i < this.firstCharToAnimate || i > this.lastCharToAnimate) 
+                {
+                    continue;
+                }
+
                 TMP_CharacterInfo charInfo = textInfo.characterInfo[i];
 
                 // Skip characters that are not visible and thus have no geometry to manipulate.
@@ -116,18 +125,16 @@
             ApplyChangesToMesh();
         }
 
-        /// <summary>
-        /// Set component to animate all visible characters
-        /// </summary>
-        public void SetAnimateAll() 
+        public void SetCharsToAnimate(int firstChar, int lastChar) 
         {
-            string taglessText = TextTagParser.RemoveAllTags(this.TextComponent.text);
-            CharacterShouldAnimate = new bool[taglessText.Length];
+            this.firstCharToAnimate = firstChar;
+            this.lastCharToAnimate = lastChar;
+            enabled = true;
+        }
 
-            for (int i = 0; i < taglessText.Length; i++) 
-            {
-                CharacterShouldAnimate[i] = true;
-            }
+        protected virtual void Awake() 
+        {
+            enabled = playOnAwake;
         }
 
         protected virtual void Start() 
@@ -138,17 +145,24 @@
 
         protected virtual void OnEnable() 
         {
-            TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTextChanged);
+            TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTMProChanged);
         }
 
         protected virtual void OnDisable() 
         {
-            TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(OnTextChanged);
+            TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(OnTMProChanged);
+
+            // Reset to baseline/standard text mesh
+            TextComponent.ForceMeshUpdate();
         }
 
-        protected virtual void OnTextChanged(Object obj) 
+        /// <summary>
+        /// This event is fired whenever the TMPro text string or MaxVisibleCharacters changes
+        /// </summary>
+        /// <param name="obj"></param>
+        protected virtual void OnTMProChanged(Object obj) 
         {
-            if (obj == TextComponent ) 
+            if (obj == TextComponent) 
             {
                 // We force an update of the text object since it would only be updated at the end of the frame. Ie. before this code is executed on the first frame.
                 // Alternatively, we could yield and wait until the end of the frame when the text object will be generated.
@@ -158,11 +172,6 @@
 
                 // Cache the vertex data of the text object as the Jitter FX is applied to the original position of the characters.
                 cachedMeshInfo = textInfo.CopyMeshInfoVertexData();
-
-                if (animateAllCharacters) 
-                {
-                    SetAnimateAll();
-                }
             }
         }
 
