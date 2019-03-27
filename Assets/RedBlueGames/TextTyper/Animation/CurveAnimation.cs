@@ -34,7 +34,7 @@
             rotation = 0f;
             scale = 1f;
 
-            if (this.CharacterShouldAnimate[characterIndex])
+            if (characterIndex >= this.firstCharToAnimate && characterIndex <= this.lastCharToAnimate) 
             {
                 float t = Time.time - this.timeAnimationStarted + (characterIndex * this.curvePreset.timeOffsetPerChar);
 

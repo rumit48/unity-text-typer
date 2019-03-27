@@ -19,12 +19,18 @@
 
         private ShakePreset shakePreset;
 
-        protected override void OnEnable() 
+        public void LoadPreset(ShakeLibrary library, string presetKey) 
         {
-            this.shakePreset = shakeLibrary[shakePresetKey];
-            base.OnEnable( );
+            this.shakeLibrary = library;
+            this.shakePresetKey = presetKey;
+            this.shakePreset = library[presetKey];
         }
 
+        protected override void OnEnable() 
+        {
+            LoadPreset(shakeLibrary, shakePresetKey);
+            base.OnEnable( );
+        }
 
         protected override void Animate(int characterIndex, out Vector2 translation, out float rotation, out float scale) 
         {
@@ -32,13 +38,18 @@
             rotation = 0f;
             scale = 1f;
 
-            if (this.CharacterShouldAnimate[characterIndex]) 
+            if (this.shakePreset == null) 
+            {
+                return;
+            }
+
+            if (characterIndex >= this.firstCharToAnimate && characterIndex <= this.lastCharToAnimate) 
             {
                 float randomX = Random.Range(-this.shakePreset.xPosStrength, this.shakePreset.xPosStrength);
                 float randomY = Random.Range(-this.shakePreset.yPosStrength, this.shakePreset.yPosStrength);
-                translation = 10f * new Vector2(randomX, randomY);
+                translation = new Vector2(randomX, randomY);
 
-                rotation = 90f * Random.Range(-this.shakePreset.RotationStrength, this.shakePreset.RotationStrength);
+                rotation = Random.Range(-this.shakePreset.RotationStrength, this.shakePreset.RotationStrength);
 
                 scale = 1f + Random.Range(-this.shakePreset.ScaleStrength, this.shakePreset.ScaleStrength);
             }

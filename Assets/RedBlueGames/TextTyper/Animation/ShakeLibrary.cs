@@ -11,19 +11,19 @@
         [Tooltip("Name identifying this preset. Can also be used as a ShakeLibrary indexer key.")]
         public string Name;
 
-        [Range(0, 1)]
+        [Range(0, 20)]
         [Tooltip("Amount of x-axis shake to apply during animation")]
         public float xPosStrength = 0f;
 
-        [Range(0, 1)]
+        [Range(0, 20)]
         [Tooltip("Amount of y-axis shake to apply during animation")]
         public float yPosStrength = 0f;
 
-        [Range(0, 1)]
+        [Range(0, 90)]
         [Tooltip("Amount of rotational shake to apply during animation")]
         public float RotationStrength = 0f;
 
-        [Range(0, 1)]
+        [Range(0, 10)]
         [Tooltip("Amount of scale shake to apply during animation")]
         public float ScaleStrength = 0f;
     }

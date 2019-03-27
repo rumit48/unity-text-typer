@@ -11,24 +11,24 @@
         [Tooltip("Name identifying this preset. Can also be used as a CurveLibrary indexer key.")]
         public string Name;
 
-        [Range( 0f, 0.5f )]
-        public float timeOffsetPerChar;
+        [Range(0f, 0.5f)]
+        public float timeOffsetPerChar = 0f;
 
         public AnimationCurve xPosCurve;
-        [Range( 0, 20 )]
-        public float xPosMultiplier;
+        [Range(0, 20)]
+        public float xPosMultiplier = 0f;
 
         public AnimationCurve yPosCurve;
-        [Range( 0, 20 )]
-        public float yPosMultiplier;
+        [Range(0, 20)]
+        public float yPosMultiplier = 0f;
 
         public AnimationCurve rotationCurve;
-        [Range( 0, 90 )]
-        public float rotationMultiplier;
+        [Range(0, 90)]
+        public float rotationMultiplier = 0f;
 
         public AnimationCurve scaleCurve;
-        [Range( 0, 10 )]
-        public float scaleMultiplier;
+        [Range(0, 10)]
+        public float scaleMultiplier = 0f;
     }
 
 

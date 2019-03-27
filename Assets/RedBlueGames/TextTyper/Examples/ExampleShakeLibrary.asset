@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShakePresets:
   - Name: LightPos
-    xPosStrength: 0.1
-    yPosStrength: 0.1
+    xPosStrength: 2
+    yPosStrength: 2
     RotationStrength: 0
     ScaleStrength: 0
-  - Name: LightRotational
+  - Name: LightRot
     xPosStrength: 0
     yPosStrength: 0
-    RotationStrength: 0.25
+    RotationStrength: 15
     ScaleStrength: 0
-  - Name: FullForce
-    xPosStrength: 0
-    yPosStrength: 0
-    RotationStrength: 1
-    ScaleStrength: 1
+  - Name: FullShake
+    xPosStrength: 3
+    yPosStrength: 3
+    RotationStrength: 20
+    ScaleStrength: 0.3
