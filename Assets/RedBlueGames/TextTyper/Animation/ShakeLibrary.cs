@@ -34,6 +34,11 @@
     {
         public List<ShakePreset> ShakePresets;
 
+        /// <summary>
+        /// Get the ShakePreset from this library with the provided key/name
+        /// </summary>
+        /// <param name="key">Key/name identifying the desired ShakePreset</param>
+        /// <returns>Matching ShakePreset</returns>
         public ShakePreset this[string key]
         {
             get

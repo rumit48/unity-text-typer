@@ -180,7 +180,8 @@
         /// <summary>
         /// Calculates print delays for every visible character in the string.
         /// Processes delay tags, punctuation delays, and default delays
-        /// Also processes shake and curve animations
+        /// Also processes shake and curve animations and spawns
+        /// the appropriate TextAnimation components
         /// </summary>
         /// <param name="text">Full text string with tags</param>
         private void ProcessCustomTags(string text) 

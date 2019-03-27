@@ -14,11 +14,16 @@
         private ShakeLibrary shakeLibrary;
 
         [SerializeField]
-        [Tooltip("The name (key) of the shake preset this animation should use")]
+        [Tooltip("The name (key) of the ShakePreset this animation should use.")]
         private string shakePresetKey;
 
         private ShakePreset shakePreset;
 
+        /// <summary>
+        /// Load a particular ShakePreset animation into this Component
+        /// </summary>
+        /// <param name="library">The library of ShakePresets that can be used by this component</param>
+        /// <param name="presetKey">The name (key) of the ShakePreset this animation should use</param>
         public void LoadPreset(ShakeLibrary library, string presetKey) 
         {
             this.shakeLibrary = library;
@@ -28,7 +33,11 @@
 
         protected override void OnEnable() 
         {
-            LoadPreset(shakeLibrary, shakePresetKey);
+            if (this.shakeLibrary != null && !string.IsNullOrEmpty(this.shakePresetKey)) 
+            {
+                LoadPreset(this.shakeLibrary, this.shakePresetKey);
+            }
+
             base.OnEnable( );
         }
 
@@ -38,6 +47,7 @@
             rotation = 0f;
             scale = 1f;
 
+            // Do nothing if a ShakePreset has not been configured yet
             if (this.shakePreset == null) 
             {
                 return;
