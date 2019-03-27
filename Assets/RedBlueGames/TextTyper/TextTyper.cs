@@ -34,6 +34,14 @@
         };
 
         [SerializeField]
+        [Tooltip("The library of ShakePreset animations that can be used by this component.")]
+        private ShakeLibrary shakeLibrary;
+
+        [SerializeField]
+        [Tooltip("The library of CurvePreset animations that can be used by this component.")]
+        private CurveLibrary curveLibrary;
+
+        [SerializeField]
         [Tooltip("Event that's called when the text has finished printing.")]
         private UnityEvent printCompleted = new UnityEvent();
 
@@ -107,7 +115,7 @@
             
             this.defaultPrintDelay = printDelay > 0 ? printDelay : PrintDelaySetting;
             this.printingText = text;
-            this.CalculatePrintDelays( text );
+            this.ProcessCustomTags( text );
 
             this.typeTextCoroutine = this.StartCoroutine(this.TypeTextCharByChar(text));
         }
@@ -141,6 +149,13 @@
                 this.StopCoroutine(this.typeTextCoroutine);
                 this.typeTextCoroutine = null;
             }
+
+            // Remove all existing TextAnimations
+            // TODO - Would be better to pool/reuse these components
+            foreach (var anim in GetComponents<TextAnimation>()) 
+            {
+                Destroy(anim);
+            }
         }
 
         private IEnumerator TypeTextCharByChar(string text)
@@ -166,20 +181,24 @@
         /// <summary>
         /// Calculates print delays for every visible character in the string.
         /// Processes delay tags, punctuation delays, and default delays
+        /// Also processes shake and curve animations
         /// </summary>
         /// <param name="text">Full text string with tags</param>
-        private void CalculatePrintDelays(string text) 
+        private void ProcessCustomTags(string text) 
         {
             characterPrintDelays = new List<float>(text.Length);
 
             var textAsSymbolList = TextTagParser.CreateSymbolListFromText(text);
 
             int printedCharCount = 0;
+            int customTagOpenIndex = 0;
+            string customTagParam = "";
             float nextDelay = this.defaultPrintDelay;
             foreach (var symbol in textAsSymbolList) 
             {
                 if (symbol.IsTag)
                 {
+                    // TODO - Verification that custom tags are not nested, b/c that will not be handled gracefully
                     if (symbol.Tag.TagType == TextTagParser.CustomTags.Delay) 
                     {
                         if (symbol.Tag.IsClosingTag) 
@@ -191,6 +210,38 @@
                             nextDelay = symbol.GetFloatParameter(this.defaultPrintDelay);
                         }
                     }
+                    else if (symbol.Tag.TagType == TextTagParser.CustomTags.Shake) 
+                    {
+                        if (symbol.Tag.IsClosingTag) {
+                            // Add a ShakeAnimation component to process this animation
+                            var anim = gameObject.AddComponent<ShakeAnimation>();
+                            anim.LoadPreset(shakeLibrary, customTagParam);
+                            anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount);
+                            anim.enabled = true;
+                        } 
+                        else 
+                        {
+                            customTagOpenIndex = printedCharCount;
+                            customTagParam = symbol.Tag.Parameter;
+                        }
+                    } 
+                    else if (symbol.Tag.TagType == TextTagParser.CustomTags.Curve) 
+                    {
+                        if (symbol.Tag.IsClosingTag) 
+                        {
+                            // Add a ShakeAnimation component to process this animation
+                            var anim = gameObject.AddComponent<CurveAnimation>();
+                            anim.LoadPreset(curveLibrary, customTagParam);
+                            anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount);
+                            anim.enabled = true;
+                        } 
+                        else 
+                        {
+                            customTagOpenIndex = printedCharCount;
+                            customTagParam = symbol.Tag.Parameter;
+                        }
+                    }
+
                 } 
                 else 
                 {

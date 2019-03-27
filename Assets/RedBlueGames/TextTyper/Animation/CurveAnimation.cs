@@ -21,9 +21,16 @@
 
         private float timeAnimationStarted;
 
+        public void LoadPreset(CurveLibrary library, string presetKey) 
+        {
+            this.curveLibrary = library;
+            this.curvePresetKey = presetKey;
+            this.curvePreset = library[presetKey];
+        }
+
         protected override void OnEnable() 
         {
-            this.curvePreset = curveLibrary[curvePresetKey];
+            LoadPreset(curveLibrary, curvePresetKey);
             this.timeAnimationStarted = Time.time;
             base.OnEnable();
         }
@@ -33,6 +40,10 @@
             translation = Vector2.zero;
             rotation = 0f;
             scale = 1f;
+
+            if (this.curvePreset == null) {
+                return;
+            }
 
             if (characterIndex >= this.firstCharToAnimate && characterIndex <= this.lastCharToAnimate) 
             {

@@ -129,7 +129,6 @@
         {
             this.firstCharToAnimate = firstChar;
             this.lastCharToAnimate = lastChar;
-            enabled = true;
         }
 
         protected virtual void Awake() 
