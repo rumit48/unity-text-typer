@@ -53,8 +53,9 @@
         private string printingText;
         private float defaultPrintDelay;
         private List<float> characterPrintDelays;
+        private List<TextAnimation> animations;
         private Coroutine typeTextCoroutine;
-        
+
         /// <summary>
         /// Gets the PrintCompleted callback event.
         /// </summary>
@@ -134,6 +135,7 @@
             this.CleanupCoroutine();
 
             this.TextComponent.maxVisibleCharacters = int.MaxValue;
+            this.UpdateMeshAndAnims();
 
             this.OnTypewritingComplete();
         }
@@ -166,15 +168,33 @@
             this.TextComponent.text = TextTagParser.RemoveCustomTags(text);
             do {
                 this.TextComponent.maxVisibleCharacters = currPrintedChars;
+                this.UpdateMeshAndAnims();
+
                 this.OnCharacterPrinted(taglessText[currPrintedChars - 1].ToString());
 
-                yield return new WaitForSeconds(characterPrintDelays[currPrintedChars - 1]);
+                yield return new WaitForSeconds(this.characterPrintDelays[currPrintedChars - 1]);
                 ++currPrintedChars;
             }
             while (currPrintedChars <= totalPrintedChars);
 
             this.typeTextCoroutine = null;
             this.OnTypewritingComplete();
+        }
+
+        private void UpdateMeshAndAnims() 
+        {
+            // This must be done here rather than in each TextAnimation's OnTMProChanged
+            // b/c we must cache mesh data for all animations before animating any of them
+
+            // Update the text mesh data (which also causes all attached TextAnimations to cache the mesh data)
+            this.TextComponent.ForceMeshUpdate();
+
+            // Force animate calls on all TextAnimations because TMPro has reset the mesh to its base state
+            // NOTE: This must happen immediately. Cannot wait until end of frame, or the base mesh will be rendered
+            for (int i = 0; i < this.animations.Count; i++) 
+            {
+                this.animations[i].AnimateAllChars();
+            }
         }
 
         /// <summary>
@@ -186,7 +206,8 @@
         /// <param name="text">Full text string with tags</param>
         private void ProcessCustomTags(string text) 
         {
-            characterPrintDelays = new List<float>(text.Length);
+            this.characterPrintDelays = new List<float>(text.Length);
+            this.animations = new List<TextAnimation>();
 
             var textAsSymbolList = TextTagParser.CreateSymbolListFromText(text);
 
@@ -215,9 +236,10 @@
                         if (symbol.Tag.IsClosingTag) {
                             // Add a ShakeAnimation component to process this animation
                             var anim = gameObject.AddComponent<ShakeAnimation>();
-                            anim.LoadPreset(shakeLibrary, customTagParam);
+                            anim.LoadPreset(this.shakeLibrary, customTagParam);
                             anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount - 1);
                             anim.enabled = true;
+                            this.animations.Add(anim);
                         } 
                         else 
                         {
@@ -229,11 +251,12 @@
                     {
                         if (symbol.Tag.IsClosingTag) 
                         {
-                            // Add a ShakeAnimation component to process this animation
+                            // Add a CurveAnimation component to process this animation
                             var anim = gameObject.AddComponent<CurveAnimation>();
-                            anim.LoadPreset(curveLibrary, customTagParam);
+                            anim.LoadPreset(this.curveLibrary, customTagParam);
                             anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount - 1);
                             anim.enabled = true;
+                            this.animations.Add(anim);
                         } 
                         else 
                         {
@@ -249,11 +272,11 @@
 
                     if (punctutationCharacters.Contains(symbol.Character)) 
                     {
-                        characterPrintDelays.Add(nextDelay * PunctuationDelayMultiplier);
+                        this.characterPrintDelays.Add(nextDelay * PunctuationDelayMultiplier);
                     } 
                     else 
                     {
-                        characterPrintDelays.Add(nextDelay);
+                        this.characterPrintDelays.Add(nextDelay);
                     }
                 }
             }

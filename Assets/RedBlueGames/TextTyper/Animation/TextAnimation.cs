@@ -57,6 +57,17 @@
             this.lastCharToAnimate = lastChar;
         }
 
+        /// <summary>
+        /// Cache the vertex data of the text object b/c the animation transform is applied to the original position of the characters.
+        /// </summary>
+        public void CacheTextMeshInfo() 
+        {
+            this.textInfo = this.TextComponent.textInfo;
+            this.cachedMeshInfo = this.textInfo.CopyMeshInfoVertexData();
+        }
+
+
+
         protected virtual void Awake() 
         {
             this.enabled = this.playOnAwake;
@@ -81,27 +92,12 @@
             this.TextComponent.ForceMeshUpdate();
         }
 
+
         protected virtual void Update() 
         {
-            if (Time.time > this.lastAnimateTime + timeBetweenAnimates) 
+            if (Time.time > this.lastAnimateTime + timeBetweenAnimates)
             {
-                this.AnimateAll();
-
-                this.lastAnimateTime = Time.time;
-            }
-        }
-
-        /// <summary>
-        /// This event is fired whenever the TMPro text string or MaxVisibleCharacters changes
-        /// </summary>
-        protected virtual void OnTMProChanged(Object obj) 
-        {
-            if (obj == this.TextComponent) 
-            {
-                this.textInfo = this.TextComponent.textInfo;
-
-                // Cache the vertex data of the text object as the animation transform is applied to the original position of the characters.
-                this.cachedMeshInfo = this.textInfo.CopyMeshInfoVertexData();
+                this.AnimateAllChars();
             }
         }
 
@@ -112,15 +108,17 @@
         /// <param name="translation">X/Y translation vector</param>
         /// <param name="rotation">2D rotation angle</param>
         /// <param name="scale">Uniform scale</param>
-        protected abstract void Animate( int characterIndex, out Vector2 translation, out float rotation, out float scale );
+        protected abstract void Animate(int characterIndex, out Vector2 translation, out float rotation, out float scale);
 
 
         /// <summary>
         /// Get the vertices of the TMPro mesh, request translation/rotation/scale info from Animate(), 
         /// then, transform the vertices and apply them back to the mesh
         /// </summary>
-        private void AnimateAll() 
+        public void AnimateAllChars() 
         {
+            this.lastAnimateTime = Time.time;
+
             int characterCount = this.textInfo.characterCount;
 
             // If no characters do nothing
@@ -205,5 +203,17 @@
                 this.TextComponent.UpdateGeometry(this.textInfo.meshInfo[i].mesh, i);
             }
         }
-   }
+
+        /// <summary>
+        /// This event is fired whenever the TMPro mesh is updated
+        /// For example, if the text string changes or MaxVisibleCharacters changes
+        /// </summary>
+        private void OnTMProChanged(Object obj) 
+        {
+            if (obj == this.TextComponent) 
+            {
+                this.CacheTextMeshInfo();
+            }
+        }
+    }
 }
