@@ -216,7 +216,7 @@
                             // Add a ShakeAnimation component to process this animation
                             var anim = gameObject.AddComponent<ShakeAnimation>();
                             anim.LoadPreset(shakeLibrary, customTagParam);
-                            anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount);
+                            anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount - 1);
                             anim.enabled = true;
                         } 
                         else 
@@ -232,7 +232,7 @@
                             // Add a ShakeAnimation component to process this animation
                             var anim = gameObject.AddComponent<CurveAnimation>();
                             anim.LoadPreset(curveLibrary, customTagParam);
-                            anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount);
+                            anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount - 1);
                             anim.enabled = true;
                         } 
                         else 
