@@ -229,12 +229,27 @@
                             nextDelay = symbol.GetFloatParameter(this.defaultPrintDelay);
                         }
                     }
-                    else if (symbol.Tag.TagType == TextTagParser.CustomTags.Shake) 
+                    else if (symbol.Tag.TagType == TextTagParser.CustomTags.Anim ||
+                             symbol.Tag.TagType == TextTagParser.CustomTags.Animation) 
                     {
                         if (symbol.Tag.IsClosingTag) {
-                            // Add a ShakeAnimation component to process this animation
-                            var anim = gameObject.AddComponent<ShakeAnimation>();
-                            anim.LoadPreset(this.shakeLibrary, customTagParam);
+                            // Add a TextAnimation component to process this animation
+                            TextAnimation anim = null;
+                            if(this.IsAnimationShake(customTagParam))
+                            {
+                                anim = gameObject.AddComponent<ShakeAnimation>();
+                                ((ShakeAnimation)anim).LoadPreset(this.shakeLibrary, customTagParam);
+                            }
+                            else if (this.IsAnimationCurve(customTagParam))
+                            {
+                                anim = gameObject.AddComponent<CurveAnimation>();
+                                ((CurveAnimation)anim).LoadPreset(this.curveLibrary, customTagParam);
+                            }
+                            else
+                            {
+                                // Could not find animation. Should we error here?
+                            }
+
                             anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount - 1);
                             anim.enabled = true;
                             this.animations.Add(anim);
@@ -244,23 +259,9 @@
                             customTagOpenIndex = printedCharCount;
                             customTagParam = symbol.Tag.Parameter;
                         }
-                    } 
-                    else if (symbol.Tag.TagType == TextTagParser.CustomTags.Curve) 
+                    } else
                     {
-                        if (symbol.Tag.IsClosingTag) 
-                        {
-                            // Add a CurveAnimation component to process this animation
-                            var anim = gameObject.AddComponent<CurveAnimation>();
-                            anim.LoadPreset(this.curveLibrary, customTagParam);
-                            anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount - 1);
-                            anim.enabled = true;
-                            this.animations.Add(anim);
-                        } 
-                        else 
-                        {
-                            customTagOpenIndex = printedCharCount;
-                            customTagParam = symbol.Tag.Parameter;
-                        }
+                        // Unrecognized CustomTag Type. Should we error here?
                     }
 
                 } 
@@ -278,6 +279,16 @@
                     }
                 }
             }
+        }
+
+        private bool IsAnimationShake(string animName)
+        {
+            return this.shakeLibrary.ContainsKey(animName);
+        }
+
+        private bool IsAnimationCurve(string animName)
+        {
+            return this.curveLibrary.ContainsKey(animName);
         }
 
         private void OnCharacterPrinted(string printedCharacter)

@@ -1,12 +1,12 @@
-﻿namespace RedBlueGames.Tools.TextTyper {
+﻿namespace RedBlueGames.Tools.TextTyper
+{
     using UnityEngine;
     using System;
     using System.Collections;
     using System.Collections.Generic;
 
-
     [Serializable]
-    public class CurvePreset 
+    public class CurvePreset
     {
         [Tooltip("Name identifying this preset. Can also be used as a CurveLibrary indexer key.")]
         public string Name;
@@ -40,9 +40,8 @@
         public float scaleMultiplier = 0f;
     }
 
-
     [CreateAssetMenu(fileName = "CurveLibrary", menuName = "Text Typer/Curve Library", order = 1)]
-    public class CurveLibrary : ScriptableObject 
+    public class CurveLibrary : ScriptableObject
     {
         public List<CurvePreset> CurvePresets;
 
@@ -55,16 +54,34 @@
         {
             get
             {
-                foreach(CurvePreset preset in CurvePresets)
+                var preset = this.FindPresetOrNull(key);
+                if (preset == null)
                 {
-                    if (preset.Name.ToUpper() == key.ToUpper()) 
-                    {
-                        return preset;
-                    }
+                    throw new KeyNotFoundException();
                 }
-
-                throw new KeyNotFoundException();
+                else
+                {
+                    return preset;
+                }
             }
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return this.FindPresetOrNull(key) != null;
+        }
+
+        private CurvePreset FindPresetOrNull(string key)
+        {
+            foreach (var preset in this.CurvePresets)
+            {
+                if (preset.Name.ToUpper() == key.ToUpper())
+                {
+                    return preset;
+                }
+            }
+
+            return null;
         }
     }
 }

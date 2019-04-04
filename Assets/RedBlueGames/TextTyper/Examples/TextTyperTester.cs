@@ -42,7 +42,7 @@
             dialogueLines.Enqueue("bold <b>text</b> test <b>bold</b> text <b>test</b>");
             dialogueLines.Enqueue("You can <size=40>size 40</size> and <size=20>size 20</size>");
             dialogueLines.Enqueue("You can <color=#ff0000ff>color</color> tag <color=#00ff00ff>like this</color>.");
-            dialogueLines.Enqueue("Sample Shake Animations: <shake=lightrot>Light Rotation</shake>, <shake=lightpos>Light Position</shake>, <shake=fullshake>Full Shake</shake>\nSample Curve Animations: <curve=slowsine>Slow Sine</curve>, <curve=bounce>Bounce Bounce</curve>, <curve=crazyflip>Crazy Flip</curve>");
+            dialogueLines.Enqueue("Sample Shake Animations: <anim=lightrot>Light Rotation</anim>, <anim=lightpos>Light Position</anim>, <anim=fullshake>Full Shake</anim>\nSample Curve Animations: <animation=slowsine>Slow Sine</animation>, <animation=bounce>Bounce Bounce</animation>, <animation=crazyflip>Crazy Flip</animation>");
             ShowScript( );
         }
 

@@ -1,12 +1,12 @@
-﻿namespace RedBlueGames.Tools.TextTyper {
+﻿namespace RedBlueGames.Tools.TextTyper
+{
     using UnityEngine;
     using System;
     using System.Collections;
     using System.Collections.Generic;
 
-
     [Serializable]
-    public class ShakePreset 
+    public class ShakePreset
     {
         [Tooltip("Name identifying this preset. Can also be used as a ShakeLibrary indexer key.")]
         public string Name;
@@ -28,9 +28,8 @@
         public float ScaleStrength = 0f;
     }
 
-
     [CreateAssetMenu(fileName = "ShakeLibrary", menuName = "Text Typer/Shake Library", order = 1)]
-    public class ShakeLibrary : ScriptableObject 
+    public class ShakeLibrary : ScriptableObject
     {
         public List<ShakePreset> ShakePresets;
 
@@ -43,16 +42,34 @@
         {
             get
             {
-                foreach(ShakePreset preset in ShakePresets) 
+                var preset = this.FindPresetOrNull(key);
+                if (preset == null)
                 {
-                    if (preset.Name.ToUpper() == key.ToUpper()) 
-                    {
-                        return preset;
-                    }
+                    throw new KeyNotFoundException();
                 }
-
-                throw new KeyNotFoundException();
+                else
+                {
+                    return preset;
+                }
             }
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return this.FindPresetOrNull(key) != null;
+        }
+
+        private ShakePreset FindPresetOrNull(string key)
+        {
+            foreach (var preset in this.ShakePresets)
+            {
+                if (preset.Name.ToUpper() == key.ToUpper())
+                {
+                    return preset;
+                }
+            }
+
+            return null;
         }
     }
 }

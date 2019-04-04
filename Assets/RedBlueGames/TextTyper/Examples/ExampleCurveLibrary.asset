@@ -73,14 +73,41 @@ MonoBehaviour:
       m_PreInfinity: 1
       m_PostInfinity: 1
       m_RotationOrder: 4
-    yPosMultiplier: 10
+    yPosMultiplier: 0
     rotationCurve:
       serializedVersion: 2
-      m_Curve: []
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -0.0062561035
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.48911172
+        value: 0.95581746
+        inSlope: -0.047005925
+        outSlope: -0.047005925
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.5025005
+      - serializedVersion: 3
+        time: 1.0041809
+        value: -0.0000076293945
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    rotationMultiplier: 0
+    rotationMultiplier: 15.2
     scaleCurve:
       serializedVersion: 2
       m_Curve:
@@ -125,7 +152,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     scaleMultiplier: 1
   - Name: SlowSine
-    timeOffsetPerChar: 0.041
+    timeOffsetPerChar: 0.058
     xPosCurve:
       serializedVersion: 2
       m_Curve: []
@@ -175,7 +202,7 @@ MonoBehaviour:
       m_PreInfinity: 1
       m_PostInfinity: 1
       m_RotationOrder: 4
-    yPosMultiplier: 10
+    yPosMultiplier: 8.3
     rotationCurve:
       serializedVersion: 2
       m_Curve: []

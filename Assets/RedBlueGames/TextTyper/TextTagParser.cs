@@ -15,16 +15,16 @@
         public struct CustomTags 
         {
             public const string Delay = "delay";
-            public const string Shake = "shake";
-            public const string Curve = "curve";
+            public const string Anim = "anim";
+            public const string Animation = "animation";
         }
 
         private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color" };
         private static readonly List<string> CustomTagTypes = new List<string> 
         {
             CustomTags.Delay,
-            CustomTags.Shake,
-            CustomTags.Curve
+            CustomTags.Anim,
+            CustomTags.Animation,
         };
         
         public static List<TextSymbol> CreateSymbolListFromText(string text)
