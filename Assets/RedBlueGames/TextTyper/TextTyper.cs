@@ -50,7 +50,6 @@
         private CharacterPrintedEvent characterPrinted = new CharacterPrintedEvent();
 
         private TextMeshProUGUI textComponent;
-        private string printingText;
         private float defaultPrintDelay;
         private List<float> characterPrintDelays;
         private List<TextAnimation> animations;
@@ -121,7 +120,6 @@
             }
 
             this.defaultPrintDelay = printDelay > 0 ? printDelay : PrintDelaySetting;
-            this.printingText = text;
             this.ProcessCustomTags(text);
 
             this.typeTextCoroutine = this.StartCoroutine(this.TypeTextCharByChar(text));
