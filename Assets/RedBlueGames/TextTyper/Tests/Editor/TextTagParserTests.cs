@@ -31,7 +31,7 @@
         [Test]
         public void RemoveCustomTags_OnlyCustomRichTextTags_ReturnsEmpty( )
         {
-            var textToType = "<delay=5></delay><shake=3></shake><animation=sine></animation>";
+            var textToType = "<delay=5></delay><shake=3></shake><curve=sine></curve>";
             var generatedText = TextTagParser.RemoveCustomTags(textToType);
 
             var expectedText = string.Empty;
