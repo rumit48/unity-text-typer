@@ -56,7 +56,7 @@
                 return;
             }
 
-            if (characterIndex >= this.firstCharToAnimate && characterIndex <= this.lastCharToAnimate) 
+            if (characterIndex >= this.FirstCharToAnimate && characterIndex <= this.LastCharToAnimate) 
             {
                 // Calculate a t based on time since the animation started, 
                 // but offset per character (to produce wave effects)

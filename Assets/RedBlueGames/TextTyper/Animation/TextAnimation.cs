@@ -11,11 +11,11 @@
     {
         [Tooltip("0-based index of the first printable character that should be animated")]
         [SerializeField]
-        protected int firstCharToAnimate;
+        private int firstCharToAnimate;
 
         [Tooltip("0-based index of the last printable character that should be animated")]
         [SerializeField]
-        protected int lastCharToAnimate;
+        private int lastCharToAnimate;
 
         [Tooltip("If true, animation will begin playing immediately on Awake")]
         [SerializeField]
@@ -31,6 +31,21 @@
         private TextMeshProUGUI textComponent;
         private TMP_TextInfo textInfo;
         private TMP_MeshInfo[] cachedMeshInfo;
+
+        protected int FirstCharToAnimate
+        {
+            get
+            {
+                return this.firstCharToAnimate;
+            }
+        }
+        protected int LastCharToAnimate
+        {
+            get
+            {
+                return this.lastCharToAnimate;
+            }
+        }
 
         private TextMeshProUGUI TextComponent
         {

@@ -53,7 +53,7 @@
                 return;
             }
 
-            if (characterIndex >= this.firstCharToAnimate && characterIndex <= this.lastCharToAnimate) 
+            if (characterIndex >= this.FirstCharToAnimate && characterIndex <= this.LastCharToAnimate) 
             {
                 float randomX = Random.Range(-this.shakePreset.xPosStrength, this.shakePreset.xPosStrength);
                 float randomY = Random.Range(-this.shakePreset.yPosStrength, this.shakePreset.yPosStrength);
