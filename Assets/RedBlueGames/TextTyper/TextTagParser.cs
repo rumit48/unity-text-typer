@@ -12,7 +12,7 @@
         /// <summary>
         /// Define custom tags here. These should also be added to the CustomTagTypes List below
         /// </summary>
-        public struct CustomTags 
+        public struct CustomTags
         {
             public const string Delay = "delay";
             public const string Anim = "anim";
@@ -20,13 +20,13 @@
         }
 
         private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color" };
-        private static readonly List<string> CustomTagTypes = new List<string> 
+        private static readonly List<string> CustomTagTypes = new List<string>
         {
             CustomTags.Delay,
             CustomTags.Anim,
             CustomTags.Animation,
         };
-        
+
         public static List<TextSymbol> CreateSymbolListFromText(string text)
         {
             var symbolList = new List<TextSymbol>();
@@ -133,7 +133,7 @@
                 }
             }
 
-            public float GetFloatParameter(float defaultValue = 0f) 
+            public float GetFloatParameter(float defaultValue = 0f)
             {
                 if (!this.IsTag)
                 {
@@ -148,7 +148,7 @@
                                   "Found Invalid parameter format in tag [{0}]. " +
                                   "Parameter [{1}] does not parse to a float.",
                                   this.Tag,
-                                  this.Tag.Parameter );
+                                  this.Tag.Parameter);
                     Debug.LogWarning(warning);
                     paramValue = defaultValue;
                 }
