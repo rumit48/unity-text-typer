@@ -1,4 +1,5 @@
-﻿namespace RedBlueGames.Tools.TextTyper {
+﻿namespace RedBlueGames.Tools.TextTyper
+{
     using System.Collections;
     using System.Collections.Generic;
     using TMPro;
@@ -7,7 +8,7 @@
     using UnityEngine.UI;
 
     [RequireComponent(typeof(TextMeshProUGUI))]
-    public abstract class TextAnimation : MonoBehaviour 
+    public abstract class TextAnimation : MonoBehaviour
     {
         [Tooltip("0-based index of the first printable character that should be animated")]
         [SerializeField]
@@ -51,7 +52,7 @@
         {
             get
             {
-                if (this.textComponent == null) 
+                if (this.textComponent == null)
                 {
                     this.textComponent = this.GetComponent<TextMeshProUGUI>();
                 }
@@ -60,13 +61,12 @@
             }
         }
 
-
         /// <summary>
         /// Set the range of characters that should be animated by this Component
         /// </summary>
         /// <param name="firstChar">0-based index of the first printable character that should be animated</param>
         /// <param name="lastChar">0-based index of the last printable character that should be animated</param>
-        public void SetCharsToAnimate(int firstChar, int lastChar) 
+        public void SetCharsToAnimate(int firstChar, int lastChar)
         {
             this.firstCharToAnimate = firstChar;
             this.lastCharToAnimate = lastChar;
@@ -75,31 +75,29 @@
         /// <summary>
         /// Cache the vertex data of the text object b/c the animation transform is applied to the original position of the characters.
         /// </summary>
-        public void CacheTextMeshInfo() 
+        public void CacheTextMeshInfo()
         {
             this.textInfo = this.TextComponent.textInfo;
             this.cachedMeshInfo = this.textInfo.CopyMeshInfoVertexData();
         }
 
-
-
-        protected virtual void Awake() 
+        protected virtual void Awake()
         {
             this.enabled = this.playOnAwake;
         }
 
-        protected virtual void Start() 
+        protected virtual void Start()
         {
             this.TextComponent.ForceMeshUpdate();
             this.lastAnimateTime = float.MinValue;
         }
 
-        protected virtual void OnEnable() 
+        protected virtual void OnEnable()
         {
             TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTMProChanged);
         }
 
-        protected virtual void OnDisable() 
+        protected virtual void OnDisable()
         {
             TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(OnTMProChanged);
 
@@ -107,8 +105,7 @@
             this.TextComponent.ForceMeshUpdate();
         }
 
-
-        protected virtual void Update() 
+        protected virtual void Update()
         {
             if (Time.time > this.lastAnimateTime + timeBetweenAnimates)
             {
@@ -125,27 +122,26 @@
         /// <param name="scale">Uniform scale</param>
         protected abstract void Animate(int characterIndex, out Vector2 translation, out float rotation, out float scale);
 
-
         /// <summary>
         /// Get the vertices of the TMPro mesh, request translation/rotation/scale info from Animate(), 
         /// then, transform the vertices and apply them back to the mesh
         /// </summary>
-        public void AnimateAllChars() 
+        public void AnimateAllChars()
         {
             this.lastAnimateTime = Time.time;
 
             int characterCount = this.textInfo.characterCount;
 
             // If no characters do nothing
-            if (characterCount == 0) 
+            if (characterCount == 0)
             {
                 return;
             }
 
-            for (int i = 0; i < characterCount; i++) 
+            for (int i = 0; i < characterCount; i++)
             {
                 // Skip characters that aren't specified to animate
-                if (i < this.firstCharToAnimate || i > this.lastCharToAnimate) 
+                if (i < this.firstCharToAnimate || i > this.lastCharToAnimate)
                 {
                     continue;
                 }
@@ -210,9 +206,9 @@
         /// <summary>
         /// Apply the modified vertices (calculated by Animate) to the mesh
         /// </summary>
-        private void ApplyChangesToMesh() 
+        private void ApplyChangesToMesh()
         {
-            for (int i = 0; i < this.textInfo.meshInfo.Length; i++) 
+            for (int i = 0; i < this.textInfo.meshInfo.Length; i++)
             {
                 this.textInfo.meshInfo[i].mesh.vertices = this.textInfo.meshInfo[i].vertices;
                 this.TextComponent.UpdateGeometry(this.textInfo.meshInfo[i].mesh, i);
@@ -223,9 +219,9 @@
         /// This event is fired whenever the TMPro mesh is updated
         /// For example, if the text string changes or MaxVisibleCharacters changes
         /// </summary>
-        private void OnTMProChanged(Object obj) 
+        private void OnTMProChanged(Object obj)
         {
-            if (obj == this.TextComponent) 
+            if (obj == this.TextComponent)
             {
                 this.CacheTextMeshInfo();
             }
