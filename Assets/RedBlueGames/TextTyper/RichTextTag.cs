@@ -81,7 +81,18 @@
 
                 // Subtract two, one for the delimeter and one for the closing character
                 var parameterLength = this.TagText.Length - parameterDelimeterIndex - 2;
-                return this.TagText.Substring(parameterDelimeterIndex + 1, parameterLength);
+                var parameter = this.TagText.Substring(parameterDelimeterIndex + 1, parameterLength);
+
+                // Kill optional enclosing quotes
+                if (parameter.Length > 0)
+                {
+                    if (parameter[0] == '\"' && parameter[parameter.Length - 1] == '\"')
+                    {
+                        parameter = parameter.Substring(1, parameter.Length - 2);
+                    }
+                }
+
+                return parameter;
             }
         }
 

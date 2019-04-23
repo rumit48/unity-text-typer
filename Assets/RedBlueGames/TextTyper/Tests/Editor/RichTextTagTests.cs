@@ -41,6 +41,23 @@
         }
 
         [Test]
+        public void Constructor_TagAndParameterWithQuotes_Parses()
+        {
+            //Arrange
+            var tag = "<color=\"red\">";
+
+            //Act
+            var richTextTag = new RichTextTag(tag);
+
+            //Assert
+            Assert.AreEqual(tag, richTextTag.TagText);
+            Assert.AreEqual("color", richTextTag.TagType);
+            Assert.IsFalse(richTextTag.IsClosingTag);
+            Assert.AreEqual("</color>", richTextTag.ClosingTagText);
+            Assert.AreEqual("red", richTextTag.Parameter);
+        }
+
+        [Test]
         public void Constructor_ClosingTag_Parses()
         {
             //Arrange
