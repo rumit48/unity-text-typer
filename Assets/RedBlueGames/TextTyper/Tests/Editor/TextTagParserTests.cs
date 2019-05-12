@@ -38,5 +38,17 @@
 
             Assert.AreEqual(expectedText, generatedText);
         }
+
+        [Test]
+        public void RemoveUnityTags_AllUnityTags_ReturnsNoTags( )
+        {
+            //"b", "i", "size", "color", "style" };
+            var textToType = "<b>a</b><i>b</i><size=40>c</size><color=red>d</color><style=C1>e</style>";
+            var generatedText = TextTagParser.RemoveUnityTags(textToType);
+
+            var expectedText = "abcde";
+
+            Assert.AreEqual(expectedText, generatedText);
+        }
     }
 }

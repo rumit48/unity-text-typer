@@ -19,7 +19,7 @@
             public const string Animation = "animation";
         }
 
-        private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color" };
+        private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color", "style" };
         private static readonly List<string> CustomTagTypes = new List<string>
         {
             CustomTags.Delay,
