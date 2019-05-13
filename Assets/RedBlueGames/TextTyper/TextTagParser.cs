@@ -19,8 +19,8 @@
             public const string Animation = "animation";
         }
 
-        private static readonly List<string> UnityTagTypes = new List<string> { "b", "i", "size", "color", "style" };
-        private static readonly List<string> CustomTagTypes = new List<string>
+        private static readonly string[] UnityTagTypes = new string[] { "b", "i", "size", "color", "style" };
+        private static readonly string[] CustomTagTypes = new string[]
         {
             CustomTags.Delay,
             CustomTags.Anim,
@@ -65,26 +65,24 @@
 
         public static string RemoveCustomTags(string textWithTags)
         {
-            string textWithoutTags = textWithTags;
-            foreach (var customTag in CustomTagTypes)
-            {
-                textWithoutTags = RichTextTag.RemoveTagsFromString(textWithoutTags, customTag);
-            }
-
-            return textWithoutTags;
+            return RemoveTags(textWithTags, CustomTagTypes);
         }
 
         public static string RemoveUnityTags(string textWithTags)
         {
+            return RemoveTags(textWithTags, UnityTagTypes);
+        }
+
+        private static string RemoveTags(string textWithTags, params string[] tags)
+        {
             string textWithoutTags = textWithTags;
-            foreach (var unityTag in UnityTagTypes)
+            foreach (var tag in tags)
             {
-                textWithoutTags = RichTextTag.RemoveTagsFromString(textWithoutTags, unityTag);
+                textWithoutTags = RichTextTag.RemoveTagsFromString(textWithoutTags, tag);
             }
 
             return textWithoutTags;
         }
-
 
         public class TextSymbol
         {
