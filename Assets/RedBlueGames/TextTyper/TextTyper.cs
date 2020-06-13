@@ -42,6 +42,10 @@
         private CurveLibrary curveLibrary;
 
         [SerializeField]
+        [Tooltip("If set, the typer will type text even if the game is paused (Time.timeScale = 0)")]
+        private bool useUnscaledTime;
+
+        [SerializeField]
         [Tooltip("Event that's called when the text has finished printing.")]
         private UnityEvent printCompleted = new UnityEvent();
 
@@ -170,7 +174,16 @@
 
                 this.OnCharacterPrinted(taglessText[currPrintedChars - 1].ToString());
 
-                yield return new WaitForSeconds(this.characterPrintDelays[currPrintedChars - 1]);
+                var delay = this.characterPrintDelays[currPrintedChars - 1];
+                if(this.useUnscaledTime)
+                {
+                    yield return new WaitForSecondsRealtime(delay);
+                }
+                else
+                {
+                    yield return new WaitForSeconds(delay);
+                }
+
                 ++currPrintedChars;
             }
             while (currPrintedChars <= totalPrintedChars);

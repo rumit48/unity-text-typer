@@ -23,6 +23,9 @@
         [SerializeField]
         private Button printNoSkipButton;
 
+        [SerializeField]
+        private Toggle pauseGameToggle;
+
         private Queue<string> dialogueLines = new Queue<string>();
 
         [SerializeField]
@@ -48,6 +51,8 @@
 
         public void Update()
         {
+            UnityEngine.Time.timeScale = this.pauseGameToggle.isOn ? 0.0f : 1.0f;
+
             if (Input.GetKeyDown(KeyCode.Space))
             {
 
