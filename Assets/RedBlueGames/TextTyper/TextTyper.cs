@@ -263,6 +263,7 @@
                                 // Could not find animation. Should we error here?
                             }
 
+                            anim.UseUnscaledTime = this.useUnscaledTime;
                             anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount - 1);
                             anim.enabled = true;
                             this.animations.Add(anim);

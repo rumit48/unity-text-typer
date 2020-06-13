@@ -33,6 +33,8 @@
         private TMP_TextInfo textInfo;
         private TMP_MeshInfo[] cachedMeshInfo;
 
+        public bool UseUnscaledTime {get; set;}
+
         protected int FirstCharToAnimate
         {
             get
@@ -58,6 +60,14 @@
                 }
 
                 return this.textComponent;
+            }
+        }
+
+        protected float TimeForTimeScale
+        {
+            get
+            {
+                return this.UseUnscaledTime ? Time.realtimeSinceStartup : Time.time;
             }
         }
 
@@ -107,7 +117,7 @@
 
         protected virtual void Update()
         {
-            if (Time.time > this.lastAnimateTime + timeBetweenAnimates)
+            if (this.TimeForTimeScale > this.lastAnimateTime + timeBetweenAnimates)
             {
                 this.AnimateAllChars();
             }
@@ -128,7 +138,7 @@
         /// </summary>
         public void AnimateAllChars()
         {
-            this.lastAnimateTime = Time.time;
+            this.lastAnimateTime = this.TimeForTimeScale;
 
             int characterCount = this.textInfo.characterCount;
 
