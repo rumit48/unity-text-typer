@@ -20,7 +20,7 @@
 
         [Tooltip("If true, animation will begin playing immediately on Awake")]
         [SerializeField]
-        private bool playOnAwake;
+        private bool playOnAwake = false;
 
         /// <summary>
         /// Determines how often Animate() will be called
