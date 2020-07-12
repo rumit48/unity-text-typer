@@ -33,6 +33,7 @@
             '?'
         };
 
+#pragma warning disable 0649 // Ignore "Field is never assigned to" warning, as it's assigned in inspector
         [SerializeField]
         [Tooltip("The library of ShakePreset animations that can be used by this component.")]
         private ShakeLibrary shakeLibrary;
@@ -44,6 +45,7 @@
         [SerializeField]
         [Tooltip("If set, the typer will type text even if the game is paused (Time.timeScale = 0)")]
         private bool useUnscaledTime;
+#pragma warning restore 0649
 
         [SerializeField]
         [Tooltip("Event that's called when the text has finished printing.")]
@@ -119,8 +121,9 @@
 
             // Remove all existing TextAnimations
             // TODO - Would be better to pool/reuse these components
-            foreach ( var anim in GetComponents<TextAnimation>( ) ) {
-                Destroy( anim );
+            foreach (var anim in GetComponents<TextAnimation>())
+            {
+                Destroy(anim);
             }
 
             this.defaultPrintDelay = printDelay > 0 ? printDelay : PrintDelaySetting;
@@ -168,14 +171,15 @@
 
             int currPrintedChars = 1;
             this.TextComponent.text = TextTagParser.RemoveCustomTags(text);
-            do {
+            do
+            {
                 this.TextComponent.maxVisibleCharacters = currPrintedChars;
                 this.UpdateMeshAndAnims();
 
                 this.OnCharacterPrinted(taglessText[currPrintedChars - 1].ToString());
 
                 var delay = this.characterPrintDelays[currPrintedChars - 1];
-                if(this.useUnscaledTime)
+                if (this.useUnscaledTime)
                 {
                     yield return new WaitForSecondsRealtime(delay);
                 }
@@ -192,7 +196,7 @@
             this.OnTypewritingComplete();
         }
 
-        private void UpdateMeshAndAnims() 
+        private void UpdateMeshAndAnims()
         {
             // This must be done here rather than in each TextAnimation's OnTMProChanged
             // b/c we must cache mesh data for all animations before animating any of them
@@ -202,7 +206,7 @@
 
             // Force animate calls on all TextAnimations because TMPro has reset the mesh to its base state
             // NOTE: This must happen immediately. Cannot wait until end of frame, or the base mesh will be rendered
-            for (int i = 0; i < this.animations.Count; i++) 
+            for (int i = 0; i < this.animations.Count; i++)
             {
                 this.animations[i].AnimateAllChars();
             }
@@ -215,7 +219,7 @@
         /// the appropriate TextAnimation components
         /// </summary>
         /// <param name="text">Full text string with tags</param>
-        private void ProcessCustomTags(string text) 
+        private void ProcessCustomTags(string text)
         {
             this.characterPrintDelays = new List<float>(text.Length);
             this.animations = new List<TextAnimation>();
@@ -226,29 +230,30 @@
             int customTagOpenIndex = 0;
             string customTagParam = "";
             float nextDelay = this.defaultPrintDelay;
-            foreach (var symbol in textAsSymbolList) 
+            foreach (var symbol in textAsSymbolList)
             {
                 if (symbol.IsTag)
                 {
                     // TODO - Verification that custom tags are not nested, b/c that will not be handled gracefully
-                    if (symbol.Tag.TagType == TextTagParser.CustomTags.Delay) 
+                    if (symbol.Tag.TagType == TextTagParser.CustomTags.Delay)
                     {
-                        if (symbol.Tag.IsClosingTag) 
+                        if (symbol.Tag.IsClosingTag)
                         {
                             nextDelay = this.defaultPrintDelay;
-                        } 
-                        else 
+                        }
+                        else
                         {
                             nextDelay = symbol.GetFloatParameter(this.defaultPrintDelay);
                         }
                     }
                     else if (symbol.Tag.TagType == TextTagParser.CustomTags.Anim ||
-                             symbol.Tag.TagType == TextTagParser.CustomTags.Animation) 
+                             symbol.Tag.TagType == TextTagParser.CustomTags.Animation)
                     {
-                        if (symbol.Tag.IsClosingTag) {
+                        if (symbol.Tag.IsClosingTag)
+                        {
                             // Add a TextAnimation component to process this animation
                             TextAnimation anim = null;
-                            if(this.IsAnimationShake(customTagParam))
+                            if (this.IsAnimationShake(customTagParam))
                             {
                                 anim = gameObject.AddComponent<ShakeAnimation>();
                                 ((ShakeAnimation)anim).LoadPreset(this.shakeLibrary, customTagParam);
@@ -267,27 +272,28 @@
                             anim.SetCharsToAnimate(customTagOpenIndex, printedCharCount - 1);
                             anim.enabled = true;
                             this.animations.Add(anim);
-                        } 
-                        else 
+                        }
+                        else
                         {
                             customTagOpenIndex = printedCharCount;
                             customTagParam = symbol.Tag.Parameter;
                         }
-                    } else
+                    }
+                    else
                     {
                         // Unrecognized CustomTag Type. Should we error here?
                     }
 
-                } 
-                else 
+                }
+                else
                 {
                     printedCharCount++;
 
-                    if (punctutationCharacters.Contains(symbol.Character)) 
+                    if (punctutationCharacters.Contains(symbol.Character))
                     {
                         this.characterPrintDelays.Add(nextDelay * PunctuationDelayMultiplier);
-                    } 
-                    else 
+                    }
+                    else
                     {
                         this.characterPrintDelays.Add(nextDelay);
                     }

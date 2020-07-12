@@ -12,6 +12,7 @@
     /// </summary>
     public class TextTyperTester : MonoBehaviour
     {
+#pragma warning disable 0649 // Ignore "Field is never assigned to" warning, as these are assigned in inspector
         [SerializeField]
         private AudioClip printSoundEffect;
 
@@ -32,6 +33,7 @@
         [Tooltip("The text typer element to test typing with")]
         private TextTyper testTextTyper;
 
+#pragma warning restore 0649
         public void Start()
         {
             this.testTextTyper.PrintCompleted.AddListener(this.HandlePrintCompleted);
