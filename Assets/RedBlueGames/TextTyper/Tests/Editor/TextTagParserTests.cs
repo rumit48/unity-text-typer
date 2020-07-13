@@ -96,5 +96,17 @@
 
             Assert.AreEqual(expectedText, generatedText);
         }
+
+        [Test]
+        public void RemoveUnityTags_SpriteTagWithValue_ReturnsTaglessText()
+        {
+            var builder = new System.Text.StringBuilder();
+            var textToType = "This string has a <sprite index=0> sprite.";
+            var generatedText = TextTagParser.RemoveUnityTags(textToType);
+
+            var expectedText = "This string has a  sprite.";
+
+            Assert.AreEqual(expectedText, generatedText);
+        }
     }
 }

@@ -57,7 +57,7 @@
 
         private TextMeshProUGUI textComponent;
         private float defaultPrintDelay;
-        private List<float> characterPrintDelays;
+        private List<TypableCharacter> charactersToType;
         private List<TextAnimation> animations;
         private Coroutine typeTextCoroutine;
 
@@ -127,7 +127,7 @@
             }
 
             this.defaultPrintDelay = printDelay > 0 ? printDelay : PrintDelaySetting;
-            this.ProcessCustomTags(text);
+            this.ProcessTags(text);
 
             this.typeTextCoroutine = this.StartCoroutine(this.TypeTextCharByChar(text));
         }
@@ -166,31 +166,24 @@
 
         private IEnumerator TypeTextCharByChar(string text)
         {
-            string taglessText = TextTagParser.RemoveAllTags(text);
-            int totalPrintedChars = taglessText.Length;
-
-            int currPrintedChars = 1;
             this.TextComponent.text = TextTagParser.RemoveCustomTags(text);
-            do
+            for (int numPrintedCharacters = 0; numPrintedCharacters < this.charactersToType.Count; ++numPrintedCharacters)
             {
-                this.TextComponent.maxVisibleCharacters = currPrintedChars;
+                this.TextComponent.maxVisibleCharacters = numPrintedCharacters + 1;
                 this.UpdateMeshAndAnims();
 
-                this.OnCharacterPrinted(taglessText[currPrintedChars - 1].ToString());
+                var printedChar = this.charactersToType[numPrintedCharacters];
+                this.OnCharacterPrinted(printedChar.ToString());
 
-                var delay = this.characterPrintDelays[currPrintedChars - 1];
                 if (this.useUnscaledTime)
                 {
-                    yield return new WaitForSecondsRealtime(delay);
+                    yield return new WaitForSecondsRealtime(printedChar.Delay);
                 }
                 else
                 {
-                    yield return new WaitForSeconds(delay);
+                    yield return new WaitForSeconds(printedChar.Delay);
                 }
-
-                ++currPrintedChars;
             }
-            while (currPrintedChars <= totalPrintedChars);
 
             this.typeTextCoroutine = null;
             this.OnTypewritingComplete();
@@ -219,11 +212,10 @@
         /// the appropriate TextAnimation components
         /// </summary>
         /// <param name="text">Full text string with tags</param>
-        private void ProcessCustomTags(string text)
+        private void ProcessTags(string text)
         {
-            this.characterPrintDelays = new List<float>(text.Length);
+            this.charactersToType = new List<TypableCharacter>();
             this.animations = new List<TextAnimation>();
-
             var textAsSymbolList = TextTagParser.CreateSymbolListFromText(text);
 
             int printedCharCount = 0;
@@ -232,7 +224,8 @@
             float nextDelay = this.defaultPrintDelay;
             foreach (var symbol in textAsSymbolList)
             {
-                if (symbol.IsTag)
+                // Sprite prints a character so we need to throw it out and treat it like a character
+                if (symbol.IsTag && !symbol.IsReplacedWithSprite)
                 {
                     // TODO - Verification that custom tags are not nested, b/c that will not be handled gracefully
                     if (symbol.Tag.TagType == TextTagParser.CustomTags.Delay)
@@ -281,7 +274,7 @@
                     }
                     else
                     {
-                        // Unrecognized CustomTag Type. Should we error here?
+                        // Tag type is likely a Unity tag, but it might be something we don't know... could error if unrecognized.
                     }
 
                 }
@@ -289,14 +282,23 @@
                 {
                     printedCharCount++;
 
-                    if (punctutationCharacters.Contains(symbol.Character))
+                    TypableCharacter characterToType = new TypableCharacter ();
+                    if (symbol.IsTag && symbol.IsReplacedWithSprite)
                     {
-                        this.characterPrintDelays.Add(nextDelay * PunctuationDelayMultiplier);
+                        characterToType.IsSprite = true;
                     }
                     else
                     {
-                        this.characterPrintDelays.Add(nextDelay);
+                        characterToType.Char = symbol.Character;
                     }
+
+                    characterToType.Delay = nextDelay;
+                    if (punctutationCharacters.Contains(symbol.Character))
+                    {
+                        characterToType.Delay *= PunctuationDelayMultiplier;
+                    }
+
+                    this.charactersToType.Add(characterToType);
                 }
             }
         }
@@ -333,6 +335,27 @@
         [System.Serializable]
         public class CharacterPrintedEvent : UnityEvent<string>
         {
+        }
+
+        /// <summary>
+        /// This class represents a printed character moment, which should correspond with a
+        /// delay in the text typer. It became necessary to make this a class when I had
+        /// to account for Sprite tags which are replaced by a sprite that counts as a "visble"
+        /// character. These sprites would not be in the Text string stripped of tags,
+        /// so this allows us to track and print them with a delay.
+        /// </summary>
+        private class TypableCharacter
+        {
+            public char Char { get; set; }
+
+            public float Delay { get; set; }
+
+            public bool IsSprite { get; set; }
+
+            public override string ToString()
+            {
+                return this.IsSprite ? "Sprite" : Char.ToString();
+            }
         }
     }
 }

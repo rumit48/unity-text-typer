@@ -167,6 +167,20 @@
                 }
             }
 
+            /// <summary>
+            /// Gets a value indicating this Symbol represents a Sprite, which is treated
+            /// as a visible character by TextMeshPro.
+            /// See Issue #35 for details.
+            /// </summary>
+            /// <value></value>
+            public bool IsReplacedWithSprite
+            {
+                get
+                {
+                    return this.IsTag && this.Tag.TagType == "sprite";
+                }
+            }
+
             public float GetFloatParameter(float defaultValue = 0f)
             {
                 if (!this.IsTag)
