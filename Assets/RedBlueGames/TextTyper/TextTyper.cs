@@ -129,6 +129,10 @@
             this.defaultPrintDelay = printDelay > 0 ? printDelay : PrintDelaySetting;
             this.ProcessTags(text);
 
+            // Fix Issue-38 by clearing any old textInfo like sprites, so that SubMesh objects don't reshow their contents.
+            var textInfo = this.TextComponent.textInfo;
+            textInfo.ClearMeshInfo(false);
+
             this.typeTextCoroutine = this.StartCoroutine(this.TypeTextCharByChar(text));
         }
 
@@ -282,7 +286,7 @@
                 {
                     printedCharCount++;
 
-                    TypableCharacter characterToType = new TypableCharacter ();
+                    TypableCharacter characterToType = new TypableCharacter();
                     if (symbol.IsTag && symbol.IsReplacedWithSprite)
                     {
                         characterToType.IsSprite = true;
