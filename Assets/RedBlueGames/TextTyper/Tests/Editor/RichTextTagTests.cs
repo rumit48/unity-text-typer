@@ -1,7 +1,5 @@
 ﻿namespace RedBlueGames.Tools.TextTyper.Tests
 {
-    using UnityEngine;
-    using UnityEditor;
     using NUnit.Framework;
 
     public class RichTextTagTests

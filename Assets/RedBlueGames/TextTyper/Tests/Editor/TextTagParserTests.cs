@@ -2,6 +2,7 @@
 {
     using UnityEditor;
     using UnityEngine;
+    //using RedBlueGames.Tools.TextTyper;
     using NUnit.Framework;
 
     public class TextTagParserTests
