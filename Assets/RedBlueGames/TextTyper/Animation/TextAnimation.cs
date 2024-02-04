@@ -1,11 +1,7 @@
 ﻿namespace RedBlueGames.Tools.TextTyper
 {
-    using System.Collections;
-    using System.Collections.Generic;
     using TMPro;
     using UnityEngine;
-    using UnityEngine.Events;
-    using UnityEngine.UI;
 
     [RequireComponent(typeof(TextMeshProUGUI))]
     public abstract class TextAnimation : MonoBehaviour
@@ -35,20 +31,8 @@
 
         public bool UseUnscaledTime {get; set;}
 
-        protected int FirstCharToAnimate
-        {
-            get
-            {
-                return this.firstCharToAnimate;
-            }
-        }
-        protected int LastCharToAnimate
-        {
-            get
-            {
-                return this.lastCharToAnimate;
-            }
-        }
+        protected int FirstCharToAnimate => this.firstCharToAnimate;
+        protected int LastCharToAnimate => this.lastCharToAnimate;
 
         private TextMeshProUGUI TextComponent
         {
@@ -63,13 +47,7 @@
             }
         }
 
-        protected float TimeForTimeScale
-        {
-            get
-            {
-                return this.UseUnscaledTime ? Time.realtimeSinceStartup : Time.time;
-            }
-        }
+        protected float TimeForTimeScale => this.UseUnscaledTime ? Time.realtimeSinceStartup : Time.time;
 
         /// <summary>
         /// Set the range of characters that should be animated by this Component

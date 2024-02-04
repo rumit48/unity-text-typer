@@ -1,6 +1,5 @@
 ﻿namespace RedBlueGames.Tools.TextTyper
 {
-    using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
 
@@ -16,10 +15,9 @@
         {
             public const string Delay = "delay";
             public const string Anim = "anim";
-            public const string Animation = "animation";
         }
 
-        private static readonly string[] UnityTags = new string[]
+        private static readonly string[] UnityTags = 
         {
             "b",
             "i",
@@ -60,7 +58,6 @@
         {
             CustomTags.Delay,
             CustomTags.Anim,
-            CustomTags.Animation,
         };
 
         public static List<TextSymbol> CreateSymbolListFromText(string text)
@@ -69,7 +66,7 @@
             int parsedCharacters = 0;
             while (parsedCharacters < text.Length)
             {
-                TextSymbol symbol = null;
+                TextSymbol symbol;
 
                 // Check for tags
                 var remainingText = text.Substring(parsedCharacters, text.Length - parsedCharacters);
@@ -92,7 +89,7 @@
 
         public static string RemoveAllTags(string textWithTags)
         {
-            string textWithoutTags = textWithTags;
+            var textWithoutTags = textWithTags;
             textWithoutTags = RemoveUnityTags(textWithoutTags);
             textWithoutTags = RemoveCustomTags(textWithoutTags);
 
@@ -111,7 +108,7 @@
 
         private static string RemoveTags(string textWithTags, params string[] tags)
         {
-            string textWithoutTags = textWithTags;
+            var textWithoutTags = textWithTags;
             foreach (var tag in tags)
             {
                 textWithoutTags = RichTextTag.RemoveTagsFromString(textWithoutTags, tag);
@@ -136,36 +133,11 @@
 
             public RichTextTag Tag { get; private set; }
 
-            public int Length
-            {
-                get
-                {
-                    return this.Text.Length;
-                }
-            }
+            public int Length => this.Text.Length;
 
-            public string Text
-            {
-                get
-                {
-                    if (this.IsTag)
-                    {
-                        return this.Tag.TagText;
-                    }
-                    else
-                    {
-                        return this.Character.ToString();
-                    }
-                }
-            }
+            public string Text => this.IsTag ? this.Tag.TagText : this.Character.ToString();
 
-            public bool IsTag
-            {
-                get
-                {
-                    return this.Tag != null;
-                }
-            }
+            public bool IsTag => this.Tag != null;
 
             /// <summary>
             /// Gets a value indicating this Symbol represents a Sprite, which is treated
@@ -173,13 +145,7 @@
             /// See Issue #35 for details.
             /// </summary>
             /// <value></value>
-            public bool IsReplacedWithSprite
-            {
-                get
-                {
-                    return this.IsTag && this.Tag.TagType == "sprite";
-                }
-            }
+            public bool IsReplacedWithSprite => this.IsTag && this.Tag.TagType == "sprite";
 
             public float GetFloatParameter(float defaultValue = 0f)
             {

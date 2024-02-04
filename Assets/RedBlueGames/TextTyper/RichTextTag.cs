@@ -1,14 +1,11 @@
 ﻿namespace RedBlueGames.Tools.TextTyper
 {
-    using System.Collections;
-    using UnityEngine;
-
     /// <summary>
     /// RichTextTags help parse text that contains HTML style tags, used by Unity's RichText text components.
     /// </summary>
     public class RichTextTag
     {
-        public static readonly RichTextTag ClearColorTag = new RichTextTag("<color=#00000000>");
+        public static readonly RichTextTag ClearColorTag = new ("<color=#00000000>");
 
         private const char OpeningNodeDelimeter = '<';
         private const char CloseNodeDelimeter = '>';
@@ -34,13 +31,7 @@
         /// Gets the text for this tag if it's used as a closing tag. Closing tags are unchanged.
         /// </summary>
         /// <value>The closing tag text.</value>
-        public string ClosingTagText
-        {
-            get
-            {
-                return this.IsClosingTag ? this.TagText : string.Format("</{0}>", this.TagType);
-            }
-        }
+        public string ClosingTagText => this.IsClosingTag ? this.TagText : string.Format("</{0}>", this.TagType);
 
         /// <summary>
         /// Gets the TagType, the body of the tag as a string
@@ -98,37 +89,19 @@
         /// Gets a value indicating whether this instance is an opening tag.
         /// </summary>
         /// <value><c>true</c> if this instance is an opening tag; otherwise, <c>false</c>.</value>
-        public bool IsOpeningTag
-        {
-            get
-            {
-                return !this.IsClosingTag;
-            }
-        }
+        public bool IsOpeningTag => !this.IsClosingTag;
 
         /// <summary>
         /// Gets a value indicating whether this instance is a closing tag.
         /// </summary>
         /// <value><c>true</c> if this instance is a closing tag; otherwise, <c>false</c>.</value>
-        public bool IsClosingTag
-        {
-            get
-            {
-                return this.TagText.Length > 2 && this.TagText[1] == EndTagDelimeter;
-            }
-        }
+        public bool IsClosingTag => this.TagText.Length > 2 && this.TagText[1] == EndTagDelimeter;
 
         /// <summary>
         /// Gets the length of the tag. Shorcut for the length of the full TagText.
         /// </summary>
         /// <value>The text length.</value>
-        public int Length
-        {
-            get
-            {
-                return this.TagText.Length;
-            }
-        }
+        public int Length => this.TagText.Length;
 
         /// <summary>
         /// Checks if the specified String starts with a tag.
@@ -137,7 +110,7 @@
         /// <param name="text">Text to check for tags.</param>
         public static bool StringStartsWithTag(string text)
         {
-            return text.StartsWith(RichTextTag.OpeningNodeDelimeter.ToString());
+            return text.StartsWith(OpeningNodeDelimeter.ToString());
         }
 
         /// <summary>
@@ -148,7 +121,7 @@
         public static RichTextTag ParseNext(string text)
         {
             // Trim up to the first delimeter
-            var openingDelimeterIndex = text.IndexOf(RichTextTag.OpeningNodeDelimeter);
+            var openingDelimeterIndex = text.IndexOf(OpeningNodeDelimeter);
 
             // No opening delimeter found. Might want to throw.
             if (openingDelimeterIndex < 0)
@@ -156,7 +129,7 @@
                 return null;
             }
 
-            var closingDelimeterIndex = text.IndexOf(RichTextTag.CloseNodeDelimeter);
+            var closingDelimeterIndex = text.IndexOf(CloseNodeDelimeter);
 
             // No closingDelimeter found. Might want to throw.
             if (closingDelimeterIndex < 0)
